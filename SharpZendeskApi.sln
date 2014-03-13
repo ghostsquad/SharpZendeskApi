@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi.Core.Test", "SharpZendeskApi.core.test\SharpZendeskApi.Core.Test.csproj", "{B93D1ECE-E386-4034-BC31-3F255675754F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi.Core", "SharpZendeskApi.Core\SharpZendeskApi.Core.csproj", "{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C243FE14-4620-413F-9608-1A314092D9E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{80D420A3-4EB6-4B40-B3B9-2AD2F1C41D22}"
+	ProjectSection(SolutionItems) = preProject
+		Settings.StyleCop = Settings.StyleCop
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B93D1ECE-E386-4034-BC31-3F255675754F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B93D1ECE-E386-4034-BC31-3F255675754F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B93D1ECE-E386-4034-BC31-3F255675754F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B93D1ECE-E386-4034-BC31-3F255675754F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
