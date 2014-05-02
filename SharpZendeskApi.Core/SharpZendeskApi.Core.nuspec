@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/ghostsquad/SharpZendeskApi/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/ghostsquad/SharpZendeskApi</projectUrl>
+    <iconUrl>https://talkdeskapp.s3.amazonaws.com/assets/integrations/zendesk_icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>C# wrapper for the Zendesk Api v2</description>
+    <releaseNotes>Alpha release</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>Zendesk Api</tags>
+  </metadata>
+</package>
