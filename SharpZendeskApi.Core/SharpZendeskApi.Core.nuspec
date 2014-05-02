@@ -15,4 +15,8 @@
     <copyright>Copyright 2014</copyright>
     <tags>Zendesk Api</tags>
   </metadata>
+  <files>
+    <file src="bin\Debug\RestSharp.dll" target="lib\net45" />
+	<file src="bin\Debug\RestSharp.xml" target="lib\net45" />	
+  </files>
 </package>
