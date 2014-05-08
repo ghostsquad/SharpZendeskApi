@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi.Core.Test", "SharpZendeskApi.core.test\SharpZendeskApi.Core.Test.csproj", "{B93D1ECE-E386-4034-BC31-3F255675754F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi.Test", "SharpZendeskApi.test\SharpZendeskApi.Test.csproj", "{B93D1ECE-E386-4034-BC31-3F255675754F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi.Core", "SharpZendeskApi.Core\SharpZendeskApi.Core.csproj", "{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpZendeskApi", "SharpZendeskApi\SharpZendeskApi.csproj", "{E6C4308B-3E50-4E5F-BB83-F109E59CA8A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C243FE14-4620-413F-9608-1A314092D9E1}"
 	ProjectSection(SolutionItems) = preProject
