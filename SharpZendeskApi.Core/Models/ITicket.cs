@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpZendeskApi.Core.Models
+﻿namespace SharpZendeskApi.Core.Models
 {
-    using SharpZendeskApi.Core.Models.Attributes;
+    using System;
+    using System.Collections.Generic;
 
-    public interface ITicket : IZendeskThing
+    public interface ITicket : IZendeskThing, ITrackable
     {
+        #region Public Properties
+
         int? AssigneeId { get; set; }
-        
+
         int? BrandId { get; }
 
         IEnumerable<int> CollaboratorIds { get; set; }
@@ -21,35 +18,33 @@ namespace SharpZendeskApi.Core.Models
         DateTime? CreatedAt { get; }
 
         IEnumerable<CustomField> CustomFields { get; set; }
-        
+
         string Description { get; }
 
         DateTime? DueAt { get; set; }
 
         string ExternalId { get; set; }
-        
+
         List<int> FollowupIds { get; }
 
         int? ForumTopicId { get; set; }
 
         int? GroupId { get; set; }
-        
+
         bool? HasIncidents { get; }
-        
-        int? Id { get; }
-        
+
         int? OrganizationId { get; }
 
         string Priority { get; set; }
 
         int? ProblemId { get; set; }
-        
+
         string Recipient { get; }
-        
+
         int? RequesterId { get; set; }
-        
+
         SatisfactionRating SatisfactionRating { get; }
-        
+
         List<int> SharingAgreementIds { get; }
 
         string Status { get; set; }
@@ -63,11 +58,13 @@ namespace SharpZendeskApi.Core.Models
         int? TicketFormId { get; }
 
         string Type { get; set; }
-        
+
         DateTime? UpdatedAt { get; }
-        
+
         string Url { get; }
-        
+
         Via Via { get; }
+
+        #endregion
     }
 }

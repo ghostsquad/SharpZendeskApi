@@ -1,12 +1,8 @@
 ﻿namespace SharpZendeskApi.Core
 {
     using System;
-    using System.Collections.Generic;
-    using System.Runtime.InteropServices.ComTypes;
 
     using RestSharp;
-
-    using SharpZendeskApi.Core.Models;
 
     using TinyIoC;
 
@@ -33,16 +29,16 @@
         /// The authentication method.
         /// </param>
         public ZendeskClient(
-            string domain, 
-            string emailAddress, 
-            string passwordOrToken, 
+            string domain,
+            string emailAddress,
+            string passwordOrToken,
             ZendeskAuthenticationMethod authenticationMethod)
-        {
+        {            
             if (authenticationMethod == ZendeskAuthenticationMethod.Token)
             {
                 // per http://developer.zendesk.com/documentation/rest_api/introduction.html
                 // If using the API token, use the following authentication format:
-                // {email_address}/token:{api_token}                
+                // {email_address}/token:{api_token}
                 emailAddress += "/token";
             }
 
@@ -62,6 +58,10 @@
 
         #endregion
 
+        #region Public Properties
+
         public TinyIoCContainer Container { get; set; }
+
+        #endregion
     }
 }

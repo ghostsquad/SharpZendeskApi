@@ -5,7 +5,7 @@
 
     using Newtonsoft.Json.Serialization;
 
-    public class CStyleNamingCustomization : IContractResolverCustomization
+    internal class CStyleNamingCustomization : IContractResolverCustomization
     {
         #region Static Fields
 

@@ -5,21 +5,15 @@
     using SharpZendeskApi.Core.Models;
 
     public interface IManager<TInterface>
-        where TInterface : IZendeskThing        
-    {
-        Dictionary<int, TInterface> Cache { get; set; }
-
+        where TInterface : IZendeskThing, ITrackable
+    {        
         IZendeskClient Client { get; set; }
-
-        void RefreshCache();
 
         IListing<TInterface> GetMany(IEnumerable<int> ids);
 
-        bool Exists(int id);
-
         bool TryGet(int id, out TInterface value);
 
-        TInterface Get(int id, bool force);
+        TInterface Get(int id);
 
         void SubmitUpdatesFor(TInterface obj);
 

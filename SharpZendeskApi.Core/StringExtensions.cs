@@ -8,7 +8,7 @@
     /// <summary>
     /// The string extensions.
     /// </summary>
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         #region Public Methods and Operators
 

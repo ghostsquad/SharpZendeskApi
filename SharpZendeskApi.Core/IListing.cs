@@ -2,15 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     using SharpZendeskApi.Core.Models;
 
-    public interface IListing<T>: IEnumerable<T> where T : IZendeskThing
+    public interface IListing<out TInterface> : IEnumerable<TInterface>
+        where TInterface : IZendeskThing, ITrackable
     {
-        IEnumerator<T> GetEnumerator(int itemsPerRequest, int maxItems = -1);
+        #region Public Properties
 
         bool AtEndOfPage { get; }
 
@@ -19,5 +17,13 @@
         int? NextPage { get; }
 
         int? PreviousPage { get; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        IEnumerator<TInterface> GetEnumerator(int itemsPerRequest, int maxItems = -1);
+
+        #endregion
     }
 }

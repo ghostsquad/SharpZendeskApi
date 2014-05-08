@@ -56,6 +56,7 @@
     <Compile Include="IZendeskSerializer.cs" />
     <Compile Include="Management\ManagerBase.cs" />
     <Compile Include="Models\ITicket.cs" />
+    <Compile Include="Models\ITrackable.cs" />
     <Compile Include="Models\TrackableZendeskThingBase.cs" />
     <Compile Include="Management\IManager.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />

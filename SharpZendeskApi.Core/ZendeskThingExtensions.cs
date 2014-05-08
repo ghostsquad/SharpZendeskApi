@@ -8,14 +8,15 @@
     using SharpZendeskApi.Core.Models;
     using SharpZendeskApi.Core.Models.Attributes;
 
-    public static class ZendeskThingExtensions
+    internal static class ZendeskThingExtensions
     {
-        public static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T>(this IZendeskThing zendeskThing) where T : IZendeskSpecialAttribute
+        public static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T>(this IZendeskThing zendeskThing)
+            where T : IZendeskSpecialAttribute
         {
             return zendeskThing.GetType().GetProperties()
                     .Where(p => p.GetCustomAttributes(typeof(T), true).Length > 0)
                     .ToList();
-        }        
+        }
 
         public static void ThrowIfAnyMandatoryPropertyIsNull(this IZendeskThing zendeskThing)
         {
@@ -44,5 +45,5 @@
                 throw new SharpZendeskException("Cannot perform this operation. The object has already been submitted to Zendesk!");
             }
         }
-    }    
+    }
 }

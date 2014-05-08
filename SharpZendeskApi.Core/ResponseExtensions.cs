@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpZendeskApi.Core
+﻿namespace SharpZendeskApi.Core
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Net;
+    using System.Text;
+    using System.Threading.Tasks;
 
     using RestSharp;
 
     using SharpZendeskApi.Core.Exceptions;
 
-    public static class ResponseExtensions
+    internal static class ResponseExtensions
     {
         public static void ThrowIfProblem(this IRestResponse response)
         {

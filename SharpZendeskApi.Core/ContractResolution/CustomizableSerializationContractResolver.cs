@@ -8,19 +8,19 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
-    public class CustomizableSerializationContractResolver : DefaultContractResolver
+    internal class CustomizableSerializationContractResolver : DefaultContractResolver
     {
         #region Fields
 
-        private Predicate<JsonProperty>[] jsonPropertyExclusions;
+        private readonly List<Predicate<JsonProperty>> jsonPropertyExclusions;
 
-        private Predicate<JsonProperty>[] jsonPropertyInclusions;
+        private readonly List<Predicate<JsonProperty>> jsonPropertyInclusions;
 
-        private Predicate<MemberInfo>[] memberInfoExclusions;
+        private readonly List<Predicate<MemberInfo>> memberInfoExclusions;
 
-        private Predicate<MemberInfo>[] memberInfoInclusions;
+        private readonly List<Predicate<MemberInfo>> memberInfoInclusions;
 
-        private Action<JsonProperty>[] modifications;
+        private readonly List<Action<JsonProperty>> modifications;
 
         #endregion
 
@@ -29,33 +29,59 @@
         public CustomizableSerializationContractResolver()
         {
             this.Customizations = new List<IContractResolverCustomization>();
+            this.jsonPropertyExclusions = new List<Predicate<JsonProperty>>();
+            this.jsonPropertyInclusions = new List<Predicate<JsonProperty>>();
+            this.memberInfoExclusions = new List<Predicate<MemberInfo>>();
+            this.memberInfoInclusions = new List<Predicate<MemberInfo>>();
+            this.modifications = new List<Action<JsonProperty>>();
         }
 
-        public CustomizableSerializationContractResolver(IContractResolverCustomization customization)
+        #endregion
+
+        #region Properties
+
+        internal IList<IContractResolverCustomization> Customizations { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        public CustomizableSerializationContractResolver Customize(IContractResolverCustomization customization)
         {
             if (customization == null)
             {
                 throw new ArgumentNullException("customization");
             }
 
-            this.Setup(new[] { customization });
-        }
+            this.Customizations.Add(customization);
 
-        public CustomizableSerializationContractResolver(IEnumerable<IContractResolverCustomization> customizations)
-        {
-            if (customizations == null)
+            if (customization.ExcludeJsonPropertyPredicate != null)
             {
-                throw new ArgumentNullException("customizations");
+                this.jsonPropertyExclusions.Add(customization.ExcludeJsonPropertyPredicate);
             }
 
-            this.Setup(customizations);
+            if (customization.IncludeJsonPropertyPredicate != null)
+            {
+                this.jsonPropertyInclusions.Add(customization.IncludeJsonPropertyPredicate);
+            }
+
+            if (customization.ExcludeMemberInfoPredicate != null)
+            {
+                this.memberInfoExclusions.Add(customization.ExcludeMemberInfoPredicate);
+            }
+
+            if (customization.IncludeMemberInfoPredicate != null)
+            {
+                this.memberInfoInclusions.Add(customization.IncludeMemberInfoPredicate);
+            }
+
+            if (customization.Modification != null)
+            {
+                this.modifications.Add(customization.Modification);
+            }
+
+            return this;
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public IList<IContractResolverCustomization> Customizations { get; set; }
 
         #endregion
 
@@ -95,22 +121,6 @@
             }
 
             return property;
-        }
-
-        private void Setup(IEnumerable<IContractResolverCustomization> customizations)
-        {
-            this.Customizations = customizations.ToList();
-
-            // TODO make this suck less
-            this.memberInfoInclusions =
-                this.Customizations.Select(x => x.IncludeMemberInfoPredicate).Where(x => x != null).ToArray();
-            this.memberInfoExclusions =
-                this.Customizations.Select(x => x.ExcludeMemberInfoPredicate).Where(x => x != null).ToArray();
-            this.jsonPropertyInclusions =
-                this.Customizations.Select(x => x.IncludeJsonPropertyPredicate).Where(x => x != null).ToArray();
-            this.jsonPropertyExclusions =
-                this.Customizations.Select(x => x.ExcludeJsonPropertyPredicate).Where(x => x != null).ToArray();
-            this.modifications = this.Customizations.Select(x => x.Modification).Where(x => x != null).ToArray();
         }
 
         #endregion

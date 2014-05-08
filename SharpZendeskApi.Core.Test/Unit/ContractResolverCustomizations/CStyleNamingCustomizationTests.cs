@@ -6,6 +6,7 @@
 
     using SharpZendeskApi.Core.ContractResolution;
 
+    using Xunit;
     using Xunit.Extensions;
 
     public class CStyleNamingCustomizationTests
@@ -31,6 +32,6 @@
 
             // assert
             jsonProperty.PropertyName.Should().Be(expectedString);
-        }
+        }        
     }
 }

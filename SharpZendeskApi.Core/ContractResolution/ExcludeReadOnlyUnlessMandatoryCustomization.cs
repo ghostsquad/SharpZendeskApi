@@ -8,7 +8,7 @@
 
     using SharpZendeskApi.Core.Models.Attributes;
 
-    public class ExcludeReadOnlyUnlessMandatoryCustomization : IContractResolverCustomization
+    internal class ExcludeReadOnlyUnlessMandatoryCustomization : IContractResolverCustomization
     {
         #region Static Fields
 
@@ -47,7 +47,13 @@
             }
         }
 
-        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate { get; private set; }
+        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public Predicate<MemberInfo> ExcludeMemberInfoPredicate
         {

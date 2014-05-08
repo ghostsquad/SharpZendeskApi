@@ -5,7 +5,7 @@
 
     using Newtonsoft.Json.Serialization;
 
-    public interface IContractResolverCustomization
+    internal interface IContractResolverCustomization
     {
         #region Public Properties
 

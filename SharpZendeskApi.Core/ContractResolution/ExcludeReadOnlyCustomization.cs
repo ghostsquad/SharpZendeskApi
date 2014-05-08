@@ -8,37 +8,52 @@
 
     using SharpZendeskApi.Core.Models.Attributes;
 
-    public class ExcludeReadOnlyCustomization : IContractResolverCustomization
+    internal class ExcludeReadOnlyCustomization : IContractResolverCustomization
     {
-        private static volatile ExcludeReadOnlyCustomization instance;
-        private static readonly object SyncRoot = new Object();
+        #region Static Fields
 
-        private ExcludeReadOnlyCustomization() { }
+        private static readonly object SyncRoot = new object();
+
+        private static volatile ExcludeReadOnlyCustomization Instance;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        private ExcludeReadOnlyCustomization()
+        {
+        }
+
+        #endregion
+
+        #region Public Properties
 
         public static ExcludeReadOnlyCustomization Default
         {
-            get 
+            get
             {
-                if (instance == null) 
+                if (Instance == null)
                 {
-                lock (SyncRoot) 
-                {
-                    if (instance == null)
+                    lock (SyncRoot)
                     {
-                        instance = new ExcludeReadOnlyCustomization();
+                        if (Instance == null)
+                        {
+                            Instance = new ExcludeReadOnlyCustomization();
+                        }
                     }
                 }
-                }
 
-                return instance;
+                return Instance;
             }
         }
 
-        public Predicate<JsonProperty> IncludeJsonPropertyPredicate { get; private set; }
-
-        public Predicate<MemberInfo> IncludeMemberInfoPredicate { get; private set; }
-
-        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate { get; private set; }
+        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public Predicate<MemberInfo> ExcludeMemberInfoPredicate
         {
@@ -48,6 +63,30 @@
             }
         }
 
-        public Action<JsonProperty> Modification { get; private set; }
+        public Predicate<JsonProperty> IncludeJsonPropertyPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public Predicate<MemberInfo> IncludeMemberInfoPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public Action<JsonProperty> Modification
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        #endregion
     }
 }

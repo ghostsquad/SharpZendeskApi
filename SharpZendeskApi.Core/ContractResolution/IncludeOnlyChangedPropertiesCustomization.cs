@@ -6,9 +6,9 @@
 
     using Newtonsoft.Json.Serialization;
 
-    public class IncludeOnlyChangedPropertiesCustomization : IContractResolverCustomization
-    {       
-        private HashSet<string> changedProperties;
+    internal class IncludeOnlyChangedPropertiesCustomization : IContractResolverCustomization
+    {
+        #region Constructors and Destructors
 
         public IncludeOnlyChangedPropertiesCustomization(HashSet<string> changedProperties)
         {
@@ -17,23 +17,55 @@
                 throw new ArgumentNullException("changedProperties");
             }
 
-            this.changedProperties = changedProperties;
+            this.ChangedProperties = changedProperties;
         }
 
-        public Predicate<JsonProperty> IncludeJsonPropertyPredicate { get; private set; }
+        #endregion
+
+        #region Public Properties
+
+        public HashSet<string> ChangedProperties { get; private set; }
+
+        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public Predicate<MemberInfo> ExcludeMemberInfoPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public Predicate<JsonProperty> IncludeJsonPropertyPredicate
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public Predicate<MemberInfo> IncludeMemberInfoPredicate
         {
             get
             {
-                return x => this.changedProperties.Contains(x.Name);
+                return x => this.ChangedProperties.Contains(x.Name);
             }
         }
 
-        public Predicate<JsonProperty> ExcludeJsonPropertyPredicate { get; private set; }
+        public Action<JsonProperty> Modification
+        {
+            get
+            {
+                return null;
+            }
+        }
 
-        public Predicate<MemberInfo> ExcludeMemberInfoPredicate { get; private set; }
-
-        public Action<JsonProperty> Modification { get; private set; }
+        #endregion
     }
 }

@@ -65,10 +65,10 @@
             this.AddPageResponse(page2);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
-            // assert            
+            // assert
             // move to page 1 item 1
             enumerator.MoveNext();
             actualTickets.AtEndOfPage.Should().BeTrue("because we are on page 1 ticket 1 of 1.");
@@ -90,7 +90,7 @@
             this.AddPageResponse(page1);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             // assert
@@ -113,7 +113,7 @@
             var expectedTickets = this.responses.SelectMany(p => p.Data.Collection.Select(t => t)).ToArray();
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             var ticketsMovedThrough = 0;
@@ -142,7 +142,7 @@
             this.responses.Add(response.Object);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             // assert
@@ -159,7 +159,7 @@
             this.AddPageResponse(page1);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             enumerator.MoveNext().Should().BeFalse();
@@ -173,7 +173,7 @@
             this.AddPageResponse(page1);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             enumerator.MoveNext().Should().BeTrue();
@@ -195,7 +195,7 @@
             this.responses.Add(response.Object);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             // assert
@@ -214,7 +214,7 @@
             this.responses.Add(response.Object);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             // assert
@@ -229,7 +229,7 @@
             this.AddPageResponse(page1);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             enumerator.MoveNext();
@@ -252,7 +252,7 @@
             this.AddPageResponse(page2);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
             var enumerator = actualTickets.GetEnumerator();
 
             enumerator.MoveNext();
@@ -273,7 +273,7 @@
             this.AddPageResponse(page1);
 
             // act
-            var actualTickets = new Listing<Ticket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
 
             // assert
             const string AssertMessage = "because we have not yet started enumerating items or pages.";

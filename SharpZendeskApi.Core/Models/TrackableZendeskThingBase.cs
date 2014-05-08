@@ -5,7 +5,7 @@
 
     using SharpZendeskApi.Core.Models.Attributes;
 
-    public class TrackableZendeskThingBase : IZendeskThing
+    public abstract class TrackableZendeskThingBase : IZendeskThing
     {
         #region Constructors and Destructors
 

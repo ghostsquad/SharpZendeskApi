@@ -28,7 +28,7 @@
                 string.Format(TicketsFromViewEndpoint, viewId),
                 Method.GET) { RootElement = typeof(Ticket).GetTypeNameAsCPlusPlusStyle().Pluralize() };
 
-            return new Listing<ITicket>(this.Client, request);
+            return new Listing<Ticket, ITicket>(this.Client, request);
         }
 
         public IListing<ITicket> FromView(View view)
@@ -51,10 +51,10 @@
             return this.GetMany(string.Format(ManyTicketsEndpoint, string.Join(",", ids)));
         }
 
-        public override ITicket Get(int id, bool force = false)
+        public override ITicket Get(int id)
         {
             var url = string.Format(SingleTicketEndpoint, id);
-            return this.Get(url, id, force);
+            return this.Get(url, id);
         }
 
         public override void SubmitUpdatesFor(ITicket obj)

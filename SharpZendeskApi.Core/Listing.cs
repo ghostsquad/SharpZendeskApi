@@ -1,15 +1,17 @@
 ﻿namespace SharpZendeskApi.Core
-{
+{    
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     using RestSharp;
 
     using SharpZendeskApi.Core.Models;
 
-    public class Listing<T> : IListing<T>
-        where T : IZendeskThing
+    public class Listing<TModel, TInterface> : IListing<TInterface>
+        where TModel : TrackableZendeskThingBase, TInterface
+        where TInterface : IZendeskThing, ITrackable
     {
         // this is the default maximum items per page for the zendesk api
         // http://developer.zendesk.com/documentation/rest_api/introduction.html#collections
@@ -51,20 +53,22 @@
 
         #region Public Methods and Operators
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<TInterface> GetEnumerator()
         {
             return this.GetEnumerator(100);
         }
 
-        public IEnumerator<T> GetEnumerator(int itemsPerRequest, int maxItems = -1)
+        public IEnumerator<TInterface> GetEnumerator(int itemsPerRequest, int maxItems = -1)
         {
-            return new ListingEnumerator<T>(this, itemsPerRequest, maxItems);
+            return new ListingEnumerator(this, itemsPerRequest, maxItems);
         }
 
         #endregion
 
         #region Explicit Interface Methods
 
+        // this is to fulfill the IEnumerable contract
+        [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
@@ -72,14 +76,15 @@
 
         #endregion
 
-        private class ListingEnumerator<T1> : IEnumerator<T1>
-            where T1 : IZendeskThing
+        private class ListingEnumerator : IEnumerator<TInterface>
         {
             #region Fields
 
+            private readonly Listing<TModel, TInterface> listing;
+
             private int currentIndexWithinPage;
 
-            private T1[] currentPageCollection;
+            private TInterface[] currentPageCollection;
 
             private int currentPageCollectionCount;
 
@@ -91,8 +96,6 @@
 
             private IRestRequest lastRequest;
 
-            private Listing<T1> listing;
-
             private int maxItems;
 
             private int totalCount;
@@ -101,7 +104,7 @@
 
             #region Constructors and Destructors
 
-            public ListingEnumerator(Listing<T1> listing, int itemsPerRequest, int maxItems)
+            public ListingEnumerator(Listing<TModel, TInterface> listing, int itemsPerRequest, int maxItems)
             {
                 this.listing = listing;
                 this.maxItems = maxItems;
@@ -114,7 +117,7 @@
 
             #region Public Properties
 
-            public T1 Current
+            public TInterface Current
             {
                 get
                 {
@@ -126,6 +129,8 @@
 
             #region Explicit Interface Properties
 
+            // this is to fulfill the IEnumerator contract
+            [ExcludeFromCodeCoverage]
             object IEnumerator.Current
             {
                 get
@@ -169,7 +174,7 @@
                 this.lastRequest = null;
                 this.currentIndexWithinPage = -1;
                 this.currentPageNumber = 0;
-                this.currentPageCollection = new T1[0];
+                this.currentPageCollection = new TInterface[0];
             }
 
             #endregion
@@ -203,7 +208,7 @@
 
                 this.lastRequest = nextRequest;
 
-                IRestResponse<IPage<T1>> response = this.listing.Client.Execute<IPage<T1>>(this.lastRequest);
+                var response = this.listing.Client.Execute<IPage<TModel>>(this.lastRequest);
 
                 response.ThrowIfProblem();
 

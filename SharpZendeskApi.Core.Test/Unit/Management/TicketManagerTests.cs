@@ -26,7 +26,7 @@
             var pageResponse = this.GetPageResponse(2);
 
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<ITicket>>(It.IsAny<IRestRequest>()))
+            this.ClientMock.Setup(x => x.Execute<IPage<Ticket>>(It.IsAny<IRestRequest>()))
                 .Returns(pageResponse)
                 .Callback<IRestRequest>(r => actualRequest = r);
 
@@ -52,7 +52,7 @@
             var pageResponse = this.GetPageResponse(2);
 
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<ITicket>>(It.IsAny<IRestRequest>()))
+            this.ClientMock.Setup(x => x.Execute<IPage<Ticket>>(It.IsAny<IRestRequest>()))
                 .Returns(pageResponse)
                 .Callback<IRestRequest>(r => actualRequest = r);
 

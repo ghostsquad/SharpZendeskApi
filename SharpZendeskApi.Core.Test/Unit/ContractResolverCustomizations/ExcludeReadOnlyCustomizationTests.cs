@@ -33,6 +33,6 @@
 
             // assert
             actualResult.Should().BeTrue("because the property has the ReadOnly attribute");
-        }        
+        }            
     }
 }
