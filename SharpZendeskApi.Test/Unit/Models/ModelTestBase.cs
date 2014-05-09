@@ -5,6 +5,8 @@
 
     using FluentAssertions;
 
+    using Microsoft.Practices.Unity;
+
     using Ploeh.AutoFixture;
 
     using RestSharp;
@@ -38,8 +40,7 @@
         public void CanDeserialize()
         {
             // arrange
-            var deserializer = new JsonDeserializer();
-            deserializer.Container.Register<TInterface, TModel>();
+            var deserializer = new JsonDeserializer();            
             var response = new RestResponse { Content = this.ModelFixture.SerializedJsonObject };
 
             // act
@@ -59,9 +60,9 @@
         [Fact]
         public void CanDeserializePage()
         {
-            // arrange
-            // arrange
+            // arrange            
             var deserializer = new JsonDeserializer();
+            var container = new UnityContainer();             
             deserializer.Container.Register(typeof(IPage<TModel>), typeof(TicketsPage));
             var response = new RestResponse { Content = this.ModelFixture.SerializedPage };
 

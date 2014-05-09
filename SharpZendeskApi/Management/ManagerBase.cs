@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
 
+    using Microsoft.Practices.Unity;
+
     using RestSharp;
 
     using SharpZendeskApi.Models;
@@ -91,7 +93,8 @@
             obj.ThrowIfSubmitted();
             obj.ThrowIfAnyMandatoryPropertyIsNull();
 
-            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Create.ToString());
+            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Update.ToString());
+
             var jsonBody = handler.Serialize(obj);
 
             var request = new RestRequest(url, Method.POST)

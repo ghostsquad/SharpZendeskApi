@@ -2,9 +2,10 @@
 {
     using System;
 
-    using RestSharp;
+    using Microsoft.Practices.Unity;
 
-    using TinyIoC;
+    using RestSharp;
+    using RestSharp.Deserializers;  
 
     /// <summary>
     /// The sharp zendesk api client.
@@ -49,19 +50,25 @@
             this.BaseUrl = apiUri.AbsoluteUri;
             this.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);
 
-            this.Container = new TinyIoCContainer();
+            this.Container = new UnityContainer();
+
+            this.ClearHandlers();
+            this.AddHandler("application/json");
+            this.AddHandler("test/json");
 
             // register default serializers
-            this.Container.Register<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
-            this.Container.Register<IZendeskSerializer, UpdatingSerializer>(SerializationScenario.Update.ToString());
+            this.Container.RegisterType<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
+            this.Container.RegisterType<IZendeskSerializer, UpdatingSerializer>(SerializationScenario.Update.ToString());
         }
 
         #endregion
 
         #region Public Properties
 
-        public TinyIoCContainer Container { get; set; }
+        public IUnityContainer Container { get; set; }
 
         #endregion
+
+        public IDeserializationResolver DeserializationResolver { get; set; }
     }
 }

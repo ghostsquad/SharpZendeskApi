@@ -93,7 +93,7 @@
                     .Returns(ExpectedJsonBody)
                     .Verifiable();
 
-            this.ClientMock.Object.Container.Register(fakeSerializerMock.Object, SerializationScenario.Create.ToString());
+            this.ClientMock.Object.DeserializationResolver.Register(fakeSerializerMock.Object, SerializationScenario.Create.ToString());
 
             const string ExpectedResource = "tickets.json";
 

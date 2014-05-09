@@ -1,11 +1,11 @@
 ﻿namespace SharpZendeskApi
 {
-    using RestSharp;
+    using Microsoft.Practices.Unity;
 
-    using TinyIoC;
+    using RestSharp;    
 
     public interface IZendeskClient : IRestClient
     {
-        TinyIoCContainer Container { get; set; }
+        IUnityContainer Container { get; set; }
     }
 }

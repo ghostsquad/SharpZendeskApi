@@ -16,9 +16,7 @@
 
     using SharpZendeskApi.Exceptions;
     using SharpZendeskApi.Management;
-    using SharpZendeskApi.Models;
-
-    using TinyIoC;
+    using SharpZendeskApi.Models;    
 
     using Xunit;
     using Xunit.Should;
@@ -38,7 +36,7 @@
 
         protected ManagerTestBase()
         {
-            this.ClientMock = new Mock<IZendeskClient>().SetupProperty(x => x.Container, new TinyIoCContainer());
+            this.ClientMock = new Mock<IZendeskClient>();
             this.ResponseMock = new Mock<IRestResponse<TModel>>();
             this.Manager = (TManager)Activator.CreateInstance(typeof(TManager), this.ClientMock.Object);
         }
@@ -210,7 +208,7 @@
                 .Returns(ExpectedJsonBody)
                 .Verifiable();
 
-            this.ClientMock.Object.Container.Register(
+            this.ClientMock.Object.DeserializationResolver.Register(
                 fakeSerializerMock.Object,
                 SerializationScenario.Create.ToString());
 
