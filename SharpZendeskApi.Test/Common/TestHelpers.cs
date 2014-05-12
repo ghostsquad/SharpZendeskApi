@@ -24,6 +24,14 @@
     /// </summary>
     public static class TestHelpers
     {
+        #region Constants
+
+        public const string CredentialTargetFormat = "ZendeskEnd2EndTests-{0}";
+
+        public const string CredentialUserNameExample = "emailaddress@@http://mydomain.zendesk.com/api/v2";
+
+        #endregion
+
         #region Static Fields
 
         public static Type[] AcceptablePrimitiveTypes = { typeof(int), typeof(bool), typeof(string) };
@@ -52,57 +60,89 @@
 
         #region Public Methods and Operators
 
-        //public static void AssertModelsEqual(IZendeskApiModel expected, object actual)
-        //{
-        //    var expectedType = expected.GetType();
-        //    var actualType = actual.GetType();
-        //    Assert.AreEqual(expectedType, actualType);
+        public static IZendeskClient GetClient(
+            ZendeskAuthenticationMethod authenticationMethod, 
+            bool useGoodPasswordToken = true)
+        {
+            try
+            {
+                var credKeyValue = GetTestCredential(authenticationMethod);
+                var password = useGoodPasswordToken ? credKeyValue.Value.Password : Guid.Empty.ToString();
 
-        //    var expectedProperties = expectedType.GetProperties().OrderBy(x => x.Name).ToList();
-        //    var actualProperties = actualType.GetProperties().OrderBy(x => x.Name).ToList();
+                var client = new ZendeskClient(
+                    credKeyValue.Key, 
+                    credKeyValue.Value.Username, 
+                    password, 
+                    authenticationMethod);
 
-        //    for (var i = 0; i < expectedProperties.Count; i++)
-        //    {
-        //        var expectedValue = expectedProperties[i].GetValue(expected);
-        //        var actualValue = actualProperties[i].GetValue(actual);
+                return client;
+            }
+            catch (Exception)
+            {
+                var expectedTarget = string.Format(CredentialTargetFormat, authenticationMethod);
 
-        //        var expectedValueAsIList = expectedValue as IList;
+                var assertMessage =
+                    string.Format(
+                        "Unable to run {0} authentication End2End tests.\n\nCreate a new Generic Credential in Credential Manager with:\n\nTarget Address as: \n\n[{1}] and\n\nUsername in this format: \n\n[{2}] ", 
+                        authenticationMethod, 
+                        expectedTarget, 
+                        CredentialUserNameExample);
 
-        //        if (expectedValueAsIList != null)
-        //        {
-        //            var actualValueAsIList = actualValue as IList;
-        //            if (actualValueAsIList != null)
-        //            {
-        //                var actualValueAsIListGenericType = actualValueAsIList.GetType().GetGenericArguments().Single();
+                Assert.False(true, assertMessage);
+            }
 
-        //                if (actualValueAsIListGenericType.GetInterfaces().Contains(typeof(IZendeskApiModel)))
-        //                {
-        //                    Assert.AreEqual(actualValueAsIList.Count, expectedValueAsIList.Count);
-        //                    for (var ii = 0; ii < actualValueAsIList.Count; ii++)
-        //                    {
-        //                        AssertModelsEqual((IZendeskApiModel)expectedValueAsIList[ii], (IZendeskApiModel)actualValueAsIList[ii]);
-        //                    }
-        //                    return;
-        //                }
+            return null;
+        }
 
-        //                CollectionAssert.AreEqual(expectedValueAsIList, actualValueAsIList);
-        //                return;
-        //            }
-        //        }
+        // public static void AssertModelsEqual(IZendeskApiModel expected, object actual)
+        // {
+        // var expectedType = expected.GetType();
+        // var actualType = actual.GetType();
+        // Assert.AreEqual(expectedType, actualType);
 
-        //        var expectedValueAsIZendeskApiModel = expectedValue as IZendeskApiModel;
-        //        if (expectedValueAsIZendeskApiModel != null)
-        //        {
-        //            var actualValueAsIZendeskApiModel = actualValue as IZendeskApiModel;
-        //            AssertModelsEqual(expectedValueAsIZendeskApiModel, actualValueAsIZendeskApiModel);
-        //            return;
-        //        }
+        // var expectedProperties = expectedType.GetProperties().OrderBy(x => x.Name).ToList();
+        // var actualProperties = actualType.GetProperties().OrderBy(x => x.Name).ToList();
 
-        //        Assert.AreEqual(expectedValue, actualValue);
-        //    }
-        //}
+        // for (var i = 0; i < expectedProperties.Count; i++)
+        // {
+        // var expectedValue = expectedProperties[i].GetValue(expected);
+        // var actualValue = actualProperties[i].GetValue(actual);
 
-        
+        // var expectedValueAsIList = expectedValue as IList;
+
+        // if (expectedValueAsIList != null)
+        // {
+        // var actualValueAsIList = actualValue as IList;
+        // if (actualValueAsIList != null)
+        // {
+        // var actualValueAsIListGenericType = actualValueAsIList.GetType().GetGenericArguments().Single();
+
+        // if (actualValueAsIListGenericType.GetInterfaces().Contains(typeof(IZendeskApiModel)))
+        // {
+        // Assert.AreEqual(actualValueAsIList.Count, expectedValueAsIList.Count);
+        // for (var ii = 0; ii < actualValueAsIList.Count; ii++)
+        // {
+        // AssertModelsEqual((IZendeskApiModel)expectedValueAsIList[ii], (IZendeskApiModel)actualValueAsIList[ii]);
+        // }
+        // return;
+        // }
+
+        // CollectionAssert.AreEqual(expectedValueAsIList, actualValueAsIList);
+        // return;
+        // }
+        // }
+
+        // var expectedValueAsIZendeskApiModel = expectedValue as IZendeskApiModel;
+        // if (expectedValueAsIZendeskApiModel != null)
+        // {
+        // var actualValueAsIZendeskApiModel = actualValue as IZendeskApiModel;
+        // AssertModelsEqual(expectedValueAsIZendeskApiModel, actualValueAsIZendeskApiModel);
+        // return;
+        // }
+
+        // Assert.AreEqual(expectedValue, actualValue);
+        // }
+        // }
 
         /// <summary>
         ///     The get member info.
@@ -177,6 +217,36 @@
             return newObject;
         }
 
+        public static KeyValuePair<string, Credential> GetTestCredential(
+            ZendeskAuthenticationMethod authenticationMethod)
+        {
+            var credTarget = string.Format(CredentialTargetFormat, authenticationMethod);
+
+            var credential = new Credential { Target = credTarget };
+            var loadResult = credential.Load();
+
+            var exceptionMsg = string.Format("No credential exists for given target {0}", credTarget);
+
+            if (!loadResult)
+            {
+                throw new InvalidOperationException(exceptionMsg);
+            }
+
+            var indexOfDoubleAt = credential.Username.IndexOf("@@", StringComparison.Ordinal);
+            if (indexOfDoubleAt < 0)
+            {
+                throw new InvalidOperationException(exceptionMsg);
+            }
+
+            var keyValue = new KeyValuePair<string, Credential>(
+                credential.Username.Substring(indexOfDoubleAt + 2), 
+                credential);
+
+            credential.Username = credential.Username.Substring(0, indexOfDoubleAt);
+
+            return keyValue;
+        }
+
         /// <summary>
         ///     The list convert.
         /// </summary>
@@ -200,7 +270,7 @@
             }
 
             return null;
-        }        
+        }
 
         #endregion
 
@@ -241,8 +311,8 @@
         /// <exception cref="InvalidOperationException">
         /// </exception>
         private static void SetPropertyOnObject(
-            PropertyInfo rootPropertyInfo,
-            object rootTargetObject,
+            PropertyInfo rootPropertyInfo, 
+            object rootTargetObject, 
             object rootSourceValue)
         {
             var targetPropertyType = rootPropertyInfo.PropertyType;
@@ -256,10 +326,10 @@
 
                 var assertMessage =
                     string.Format(
-                        "Source is is a complex Json Object, and target is not. Actual type: [{0}]",
+                        "Source is is a complex Json Object, and target is not. Actual type: [{0}]", 
                         targetPropertyType);
 
-                targetIsComplex.Should().BeTrue(assertMessage);                
+                targetIsComplex.Should().BeTrue(assertMessage);
 
                 object newObject = Activator.CreateInstance(targetPropertyType);
 
@@ -281,14 +351,12 @@
                     var targetPropertyGenericCollectionType = targetPropertyType.GetGenericArguments().Single();
 
                     // http://stackoverflow.com/questions/5909144/how-to-create-listt-instance-in-c-sharp-file-using-reflection
-                    var constructorInfo = typeof(List<>).MakeGenericType(targetPropertyGenericCollectionType)
-                        .GetConstructor(Type.EmptyTypes);
+                    var constructorInfo =
+                        typeof(List<>).MakeGenericType(targetPropertyGenericCollectionType)
+                            .GetConstructor(Type.EmptyTypes);
                     if (constructorInfo != null)
                     {
-                        var newComplexCollection =
-                            (IList)
-                            constructorInfo
-                                .Invoke(null);
+                        var newComplexCollection = (IList)constructorInfo.Invoke(null);
 
                         foreach (object item in rootSourceValueAsIList)
                         {
@@ -299,12 +367,13 @@
 
                         rootPropertyInfo.SetValue(rootTargetObject, newComplexCollection);
                     }
+
                     return;
                 }
 
                 object newPrimitiveCollection = ListConvert<int>(rootSourceValueAsIList, newCollectionGenericType)
-                                       ?? ListConvert<string>(rootSourceValueAsIList, newCollectionGenericType)
-                                       ?? ListConvert<bool>(rootSourceValueAsIList, newCollectionGenericType);
+                                                ?? ListConvert<string>(rootSourceValueAsIList, newCollectionGenericType)
+                                                ?? ListConvert<bool>(rootSourceValueAsIList, newCollectionGenericType);
 
                 if (newPrimitiveCollection != null)
                 {
@@ -327,8 +396,8 @@
 
                 throw new InvalidOperationException(
                     string.Format(
-                        "value is null, and property [{0}] of type [{1}] is not nullable.",
-                        rootPropertyInfo.Name,
+                        "value is null, and property [{0}] of type [{1}] is not nullable.", 
+                        rootPropertyInfo.Name, 
                         targetPropertyType));
             }
 
@@ -336,14 +405,16 @@
             if (targetPropertyType == typeof(DateTime) || targetPropertyType == typeof(DateTime?))
             {
                 DateTime valueAsDate;
-                var parseResult = DateTimeExtensions.TryParseExactIso8601DateTime(rootSourceValue.ToString(), out valueAsDate);                
+                var parseResult = DateTimeExtensions.TryParseExactIso8601DateTime(
+                    rootSourceValue.ToString(), 
+                    out valueAsDate);
                 if (!parseResult)
                 {
                     throw new InvalidOperationException(
                         string.Format(
-                            "Attempt to parse [{0}] to [{1}] for model property[{2}] failed.",
-                            rootSourceValue,
-                            targetPropertyType,
+                            "Attempt to parse [{0}] to [{1}] for model property[{2}] failed.", 
+                            rootSourceValue, 
+                            targetPropertyType, 
                             rootPropertyInfo.Name));
                 }
 
@@ -354,8 +425,7 @@
             // accept primitive types
             if ((targetPropertyType == typeof(string) && rootSourceValue is string)
                 || (targetPropertyType == typeof(bool) && rootSourceValue is bool)
-                || (rootSourceValue is int
-                    && (targetPropertyType == typeof(int) || targetPropertyType == typeof(int?))))
+                || (rootSourceValue is int && (targetPropertyType == typeof(int) || targetPropertyType == typeof(int?))))
             {
                 rootPropertyInfo.SetValue(rootTargetObject, rootSourceValue);
                 return;
@@ -368,71 +438,5 @@
         }
 
         #endregion
-
-        public const string CredentialTargetFormat = "ZendeskEnd2EndTests-{0}";
-        public const string CredentialUserNameExample = "emailaddress@@http://mydomain.zendesk.com/api/v2";
-
-        public static KeyValuePair<string, Credential> GetTestCredential(ZendeskAuthenticationMethod authenticationMethod)
-        {
-            var credTarget = string.Format(CredentialTargetFormat, authenticationMethod);
-            
-            var credential = new Credential { Target = credTarget };
-            var loadResult = credential.Load();
-
-            var exceptionMsg =
-                string.Format("No credential exists for given target {0}", credTarget);
-
-            if (!loadResult)
-            {
-                throw new InvalidOperationException(exceptionMsg);
-            }
-
-            var indexOfDoubleAt = credential.Username.IndexOf("@@", StringComparison.Ordinal);
-            if (indexOfDoubleAt < 0)
-            {
-                throw new InvalidOperationException(exceptionMsg);
-            }
-
-            var keyValue = new KeyValuePair<string, Credential>(
-                credential.Username.Substring(indexOfDoubleAt + 2), 
-                credential);
-
-            credential.Username = credential.Username.Substring(0, indexOfDoubleAt);
-
-            return keyValue;
-        }
-
-        public static IZendeskClient GetClient(
-            ZendeskAuthenticationMethod authenticationMethod,
-            bool useGoodPasswordToken = true)
-        {
-            try
-            {
-                var credKeyValue = GetTestCredential(authenticationMethod);
-                var password = useGoodPasswordToken ? credKeyValue.Value.Password : Guid.Empty.ToString();
-
-                var client = new ZendeskClient(
-                    credKeyValue.Key,
-                    credKeyValue.Value.Username,
-                    password,
-                    authenticationMethod);
-
-                return client;
-            }
-            catch (Exception)
-            {
-                var expectedTarget = string.Format(CredentialTargetFormat, authenticationMethod);
-
-                var assertMessage = string.Format(
-                    "Unable to run {0} authentication End2End tests.\n\nCreate a new Generic Credential in Credential Manager with:\n\nTarget Address as: \n\n[{1}] and\n\nUsername in this format: \n\n[{2}] ",
-                    authenticationMethod,
-                    expectedTarget,
-                    CredentialUserNameExample);
-
-                Assert.False(true, assertMessage);
-            }
-            
-            return null;
-        }
     }
 }

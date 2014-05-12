@@ -93,7 +93,7 @@
             obj.ThrowIfSubmitted();
             obj.ThrowIfAnyMandatoryPropertyIsNull();
 
-            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Update.ToString());
+            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Create.ToString());
 
             var jsonBody = handler.Serialize(obj);
 
@@ -122,7 +122,7 @@
                 return;
             }
 
-            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Create.ToString());
+            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Update.ToString());
             var jsonBody = handler.Serialize(obj);
 
             var request = new RestRequest(url, Method.PUT)

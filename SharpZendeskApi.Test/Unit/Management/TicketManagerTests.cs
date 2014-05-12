@@ -5,6 +5,8 @@
 
     using FluentAssertions;
 
+    using Microsoft.Practices.Unity;
+
     using Moq;
 
     using RestSharp;
@@ -93,7 +95,9 @@
                     .Returns(ExpectedJsonBody)
                     .Verifiable();
 
-            this.ClientMock.Object.DeserializationResolver.Register(fakeSerializerMock.Object, SerializationScenario.Create.ToString());
+            this.ClientMock.Object.Container.RegisterInstance<IZendeskSerializer>(
+                SerializationScenario.Create.ToString(),
+                fakeSerializerMock.Object);
 
             const string ExpectedResource = "tickets.json";
 

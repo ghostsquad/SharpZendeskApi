@@ -8,6 +8,8 @@
 
     using FluentAssertions;
 
+    using Microsoft.Practices.Unity;
+
     using Moq;
 
     using Ploeh.AutoFixture;
@@ -37,6 +39,7 @@
         protected ManagerTestBase()
         {
             this.ClientMock = new Mock<IZendeskClient>();
+            this.ClientMock.SetupProperty(x => x.Container, new UnityContainer());
             this.ResponseMock = new Mock<IRestResponse<TModel>>();
             this.Manager = (TManager)Activator.CreateInstance(typeof(TManager), this.ClientMock.Object);
         }
@@ -208,9 +211,9 @@
                 .Returns(ExpectedJsonBody)
                 .Verifiable();
 
-            this.ClientMock.Object.DeserializationResolver.Register(
-                fakeSerializerMock.Object,
-                SerializationScenario.Create.ToString());
+            this.ClientMock.Object.Container.RegisterInstance<IZendeskSerializer>(
+                SerializationScenario.Update.ToString(),
+                fakeSerializerMock.Object);
 
             const string ExpectedResource = "tickets/1.json";
 

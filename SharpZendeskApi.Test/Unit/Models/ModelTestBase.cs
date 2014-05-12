@@ -62,8 +62,10 @@
         {
             // arrange            
             var deserializer = new JsonDeserializer();
-            var container = new UnityContainer();             
-            deserializer.Container.Register(typeof(IPage<TModel>), typeof(TicketsPage));
+            var container = new UnityContainer();
+            container.RegisterType(typeof(IPage<TModel>), typeof(TicketsPage));
+
+            deserializer.DeserializationResolver = x => container.Resolve(x);
             var response = new RestResponse { Content = this.ModelFixture.SerializedPage };
 
             var actualModel = deserializer.Deserialize<IPage<TModel>>(response);
