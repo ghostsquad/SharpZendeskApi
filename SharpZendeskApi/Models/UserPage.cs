@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
-    public class UserPage : IPage<IUser>
+    internal class UserPage : IPage<User>
     {
-        public IList<IUser> Collection
+        public IList<User> Collection
         {
             get
             {
@@ -20,7 +20,7 @@
             }
         }
 
-        public IList<IUser> Users { get; set; }
+        public IList<User> Users { get; set; }
 
         public string NextPage { get; set; }
 

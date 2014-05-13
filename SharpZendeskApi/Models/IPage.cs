@@ -10,11 +10,11 @@ namespace SharpZendeskApi.Models
 {
     using System.Collections.Generic;
 
-    internal interface IPage<TInterface> where TInterface : class, IZendeskThing, ITrackable
+    internal interface IPage<TModel> where TModel : class, IZendeskThing, ITrackable
     {
         #region Public Properties
 
-        IList<TInterface> Collection { get; set; }
+        IList<TModel> Collection { get; set; }
 
         string NextPage { get; set; }
 

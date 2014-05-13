@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
-    internal class TicketsPage : IPage<ITicket>
+    internal class TicketsPage : IPage<Ticket>
     {
-        public IList<ITicket> Collection
+        public IList<Ticket> Collection
         {
             get
             {
@@ -20,7 +20,7 @@
             }
         }
 
-        public IList<ITicket> Tickets { get; set; } 
+        public IList<Ticket> Tickets { get; set; } 
 
         public string NextPage { get; set; }
 

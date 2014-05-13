@@ -42,7 +42,7 @@ namespace SharpZendeskApi.Management
             this.SubmitUpdatesFor(url, obj);
         }
 
-        public IListing<IView> GetAvailableViews(bool full)
+        public IListing<IView> GetAvailableViews(bool full = false)
         {
             var url = full ? CreateListEndpoint : CompactListEndpoint;
 

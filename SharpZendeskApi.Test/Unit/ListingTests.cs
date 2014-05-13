@@ -221,6 +221,35 @@
             enumerator.Invoking(x => x.MoveNext()).ShouldThrow<UnauthorizedAccessException>();
         }
 
+        [Fact(Timeout = 200)]
+        public void MoveNext_GivenMultipageMultiItem_WhenAtVeryEnd_ExpectFalse()
+        {
+            // arrange
+            var page1 = this.GetTicketPage(2, Page2Uri);
+            this.AddPageResponse(page1);
+            var page2 = this.GetTicketPage(2);
+            this.AddPageResponse(page2);
+
+            // act
+            var actualTickets = new Listing<Ticket, ITicket>(this.clientMock.Object, Mock.Of<IRestRequest>());
+            var enumerator = actualTickets.GetEnumerator();
+
+            // move to page 1 item 1
+            enumerator.MoveNext().Should().BeTrue();
+            enumerator.Current.Should().Be(page1.Collection[0]);
+            // move to page 1 item 2
+            enumerator.MoveNext().Should().BeTrue();
+            enumerator.Current.Should().Be(page1.Collection[1]);
+            // move to page 2 item 1
+            enumerator.MoveNext().Should().BeTrue();
+            enumerator.Current.Should().Be(page2.Collection[0]);
+            // move to page 2 item 2
+            enumerator.MoveNext().Should().BeTrue();
+            enumerator.Current.Should().Be(page2.Collection[1]);
+            // verify end
+            enumerator.MoveNext().Should().BeFalse();
+        }
+
         [Fact]
         public void PageNumbers_GivenTwoPageResponseWhenOnFirstPage_ExpectPreviousPageNullCurrentPage1NextPage2()
         {

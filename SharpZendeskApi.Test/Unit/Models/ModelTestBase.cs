@@ -76,7 +76,7 @@
             deserializer.DeserializationResolver = x => deserializer.Container.Resolve(x);
             var response = new RestResponse { Content = this.ModelFixture.SerializedPage };
 
-            var actualModel = deserializer.Deserialize<IPage<TInterface>>(response);
+            var actualModel = deserializer.Deserialize<IPage<TModel>>(response);
 
             actualModel.Collection.Should().HaveCount(3);
             actualModel.Count.ShouldBeGreaterThan(0);

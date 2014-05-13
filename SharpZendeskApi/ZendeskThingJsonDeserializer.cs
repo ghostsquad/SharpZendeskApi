@@ -34,9 +34,9 @@
             this.Container.RegisterType<IView, View>();
 
             // pages
-            this.Container.RegisterType<IPage<ITicket>, TicketsPage>();
-            this.Container.RegisterType<IPage<IUser>, UserPage>();
-            this.Container.RegisterType<IPage<IView>, ViewPage>();
+            this.Container.RegisterType<IPage<Ticket>, TicketsPage>();
+            this.Container.RegisterType<IPage<User>, UserPage>();
+            this.Container.RegisterType<IPage<View>, ViewPage>();            
 
             this.DeserializationResolver = x => this.Container.Resolve(x);
         }

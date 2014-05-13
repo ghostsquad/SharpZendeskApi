@@ -9,8 +9,11 @@
     using SharpZendeskApi.Models;
     using SharpZendeskApi.Test.Common.JsonObjects;
 
+    using Xunit;
+
     public class UserTests : ModelTestBase<UserJson, User, IUser>
     {
+        [Fact(Skip = "not implemented")]
         public override void CanCreateWithFilledMandatoryPropertiesUsingConstructor()
         {
             throw new NotImplementedException();

@@ -45,6 +45,9 @@
                 emailAddress += "/token";
             }
 
+            this.Timeout = 30000;
+            this.MaxRedirects = 10;
+
             var domainUri = new Uri(domain);
             var apiUri = new Uri(domainUri, "api/v2");
 

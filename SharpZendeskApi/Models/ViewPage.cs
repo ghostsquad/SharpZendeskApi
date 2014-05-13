@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
-    public class ViewPage : IPage<IView>
+    internal class ViewPage : IPage<View>
     {
-        public IList<IView> Collection
+        public IList<View> Collection
         {
             get
             {
@@ -20,7 +20,7 @@
             }
         }
 
-        public IList<IView> Views { get; set; }
+        public IList<View> Views { get; set; }
 
         public string NextPage { get; set; }
 

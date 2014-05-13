@@ -26,7 +26,7 @@
         /// <summary>
         /// The given incorrect password based credentials to known zendesk portal when ticket requested expect exception.
         /// </summary>
-        [Fact]        
+        [Fact(Timeout = 10000)]        
         public void GivenIncorrectPasswordBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectUnauthorized()
         {           
             // arrange
@@ -42,7 +42,7 @@
         /// <summary>
         /// The given incorrect token based credentials to known zendesk portal when ticket requested expect exception.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenIncorrectTokenBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectUnauthorized()
         {
             // arrange
@@ -58,7 +58,7 @@
         /// <summary>
         /// The given password based credentials to known zendesk portal when ticket requested expect ok response.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenPasswordBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectOkResponse()
         {
             // arrange
@@ -74,7 +74,7 @@
         /// <summary>
         /// The given token based credentials to known zendesk portal when ticket requested expect ok response.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenTokenBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectOkResponse()
         {
             // arrange
