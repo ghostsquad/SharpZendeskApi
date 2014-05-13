@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ShareZendeskApi")]
+[assembly: AssemblyTitle("SharpZendeskApi")]
 [assembly: AssemblyDescription("C# wrapper for the Zendesk Api v2")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Weston McNamee")]
-[assembly: AssemblyProduct("ShareZendeskApi")]
+[assembly: AssemblyProduct("SharpZendeskApi")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.3.1")]
+[assembly: AssemblyVersion("0.1.3.2")]
 [assembly: AssemblyFileVersion("0.1.0.0")]
