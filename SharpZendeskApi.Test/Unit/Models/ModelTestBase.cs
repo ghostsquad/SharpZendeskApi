@@ -62,7 +62,12 @@
         {
             // arrange            
             var deserializer = new ZendeskThingJsonDeserializer();                        
-            //deserializer.Container.Register(typeof(IPage<TModel>), typeof(TicketsPage));
+            var container = new UnityContainer();
+            container.RegisterType<ITicket, Ticket>();
+            container.RegisterType<ISatisfactionRating, SatisfactionRating>();            
+            container.RegisterType<IPage<ITicket>, TicketsPage>();
+
+            deserializer.DeserializationResolver = x => container.Resolve(x);
             var response = new RestResponse { Content = this.ModelFixture.SerializedPage };
 
             var actualModel = deserializer.Deserialize<IPage<TInterface>>(response);

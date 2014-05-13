@@ -54,11 +54,11 @@
 
             this.Container = new UnityContainer();
 
-            var jsonDerserializer = new JsonDeserializer { DeserializationResolver = x => this.Container.Resolve(x) };
+            var deserializer = new JsonDeserializer();
 
             this.ClearHandlers();
-            this.AddHandler("application/json", jsonDerserializer);
-            this.AddHandler("test/json", jsonDerserializer);
+            this.AddHandler("application/json", deserializer);
+            this.AddHandler("test/json", deserializer);
 
             // register default serializers
             this.Container.RegisterType<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
@@ -71,6 +71,6 @@
 
         public IUnityContainer Container { get; set; }
 
-        #endregion        
+        #endregion
     }
 }
