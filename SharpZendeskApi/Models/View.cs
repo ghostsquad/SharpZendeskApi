@@ -14,11 +14,15 @@
 namespace SharpZendeskApi.Models
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    using SharpZendeskApi.Models.Attributes;
 
     /// <summary>
     ///     The view.
     /// </summary>
-    public class View : TrackableZendeskThingBase
+    public class View : TrackableZendeskThingBase, IView
     {
         #region Public Properties
 
@@ -31,6 +35,13 @@ namespace SharpZendeskApi.Models
         ///     Gets or sets the conditions.
         /// </summary>
         public Conditions Conditions { get; set; }
+
+        public IList<Condition> All { get; set; }
+
+        public IList<Condition> Any { get; set; }
+
+        [ReadOnly]
+        public string Url { get; set; }
 
         /// <summary>
         ///     Gets or sets the created at.
@@ -55,6 +66,7 @@ namespace SharpZendeskApi.Models
         /// <summary>
         ///     Gets or sets the title.
         /// </summary>
+        [Mandatory]
         public string Title { get; set; }
 
         /// <summary>

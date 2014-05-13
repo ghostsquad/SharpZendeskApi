@@ -62,11 +62,25 @@ namespace SharpZendeskApi.Models
     using System;
     using System.Collections.Generic;
 
+    using Microsoft.Practices.Unity;
+
     /// <summary>
     /// The user.
     /// </summary>
-    public class User : TrackableZendeskThingBase
+    public class User : TrackableZendeskThingBase, IUser
     {
+        public User(string email, string name, string role)
+        {
+            this.Email = email;
+            this.Name = name;
+            this.Role = role;
+        }
+
+        [InjectionConstructor]
+        public User()
+        {            
+        }
+
         #region Public Properties
 
         /// <summary>
@@ -152,7 +166,7 @@ namespace SharpZendeskApi.Models
         /// <summary>
         /// Gets or sets the photo.
         /// </summary>
-        public Attachment Photo { get; set; }
+        public IAttachment Photo { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether restricted agent.
@@ -187,7 +201,7 @@ namespace SharpZendeskApi.Models
         /// <summary>
         /// Gets or sets the tags.
         /// </summary>
-        public List<string> Tags { get; set; }
+        public IList<string> Tags { get; set; }
 
         /// <summary>
         /// Gets or sets the ticket restriction.
@@ -212,7 +226,7 @@ namespace SharpZendeskApi.Models
         /// <summary>
         /// Gets or sets the user fields.
         /// </summary>
-        public List<CustomField> UserFields { get; set; }
+        public IList<CustomField> UserFields { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether verified.

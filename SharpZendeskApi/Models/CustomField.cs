@@ -5,9 +5,11 @@ namespace SharpZendeskApi.Models
     /// <summary>
     ///     The custom field.
     /// </summary>
-    public class CustomField : TrackableZendeskThingBase
+    public class CustomField
     {
         #region Public Properties
+
+        public int? Id { get; set; }
 
         /// <summary>
         ///     Gets or sets the value.

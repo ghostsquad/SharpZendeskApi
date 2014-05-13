@@ -5,7 +5,9 @@
     using Microsoft.Practices.Unity;
 
     using RestSharp;
-    using RestSharp.Deserializers;  
+    using RestSharp.Deserializers;
+
+    using SharpZendeskApi.Models;
 
     /// <summary>
     /// The sharp zendesk api client.
@@ -52,9 +54,11 @@
 
             this.Container = new UnityContainer();
 
+            var jsonDerserializer = new JsonDeserializer { DeserializationResolver = x => this.Container.Resolve(x) };
+
             this.ClearHandlers();
-            this.AddHandler("application/json");
-            this.AddHandler("test/json");
+            this.AddHandler("application/json", jsonDerserializer);
+            this.AddHandler("test/json", jsonDerserializer);
 
             // register default serializers
             this.Container.RegisterType<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
@@ -67,8 +71,6 @@
 
         public IUnityContainer Container { get; set; }
 
-        #endregion
-
-        public IDeserializationResolver DeserializationResolver { get; set; }
+        #endregion        
     }
 }

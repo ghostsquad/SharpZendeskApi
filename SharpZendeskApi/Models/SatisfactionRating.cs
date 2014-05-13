@@ -18,7 +18,7 @@ namespace SharpZendeskApi.Models
     /// <summary>
     ///     The satisfaction rating.
     /// </summary>
-    public class SatisfactionRating : TrackableZendeskThingBase
+    public class SatisfactionRating : TrackableZendeskThingBase, ISatisfactionRating
     {
         #region Public Properties
 

@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
 
+    using SharpZendeskApi.Models.Attributes;
+
     public interface ITicket : IZendeskThing, ITrackable
     {
         #region Public Properties
@@ -15,8 +17,6 @@
 
         string Comment { get; set; }
 
-        DateTime? CreatedAt { get; }
-
         IEnumerable<CustomField> CustomFields { get; set; }
 
         string Description { get; }
@@ -25,7 +25,7 @@
 
         string ExternalId { get; set; }
 
-        List<int> FollowupIds { get; }
+        IList<int> FollowupIds { get; }
 
         int? ForumTopicId { get; set; }
 
@@ -43,9 +43,9 @@
 
         int? RequesterId { get; set; }
 
-        SatisfactionRating SatisfactionRating { get; }
+        ISatisfactionRating SatisfactionRating { get; }
 
-        List<int> SharingAgreementIds { get; }
+        IList<int> SharingAgreementIds { get; }
 
         string Status { get; set; }
 
@@ -59,11 +59,16 @@
 
         string Type { get; set; }
 
-        DateTime? UpdatedAt { get; }
+        Via Via { get; }
 
+        [ReadOnly]
         string Url { get; }
 
-        Via Via { get; }
+        [ReadOnly]
+        DateTime? UpdatedAt { get; }
+
+        [ReadOnly]
+        DateTime? CreatedAt { get; }
 
         #endregion
     }

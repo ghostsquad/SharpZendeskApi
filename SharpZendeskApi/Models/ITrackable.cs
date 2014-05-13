@@ -1,7 +1,12 @@
 ﻿namespace SharpZendeskApi.Models
 {
+    using System;
+
+    using SharpZendeskApi.Models.Attributes;
+
     public interface ITrackable
     {
-        int? Id { get; }
+        [ReadOnly]
+        int? Id { get; }        
     }
 }

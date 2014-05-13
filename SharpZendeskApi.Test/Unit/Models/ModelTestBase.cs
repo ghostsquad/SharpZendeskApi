@@ -22,7 +22,7 @@
     // ReSharper disable once InconsistentNaming
     public abstract class ModelTestBase<TJson, TModel, TInterface> : IUseFixture<ModelFixture<TJson, TModel>>
         where TJson : JsonTestObjectBase
-        where TInterface : class, IZendeskThing
+        where TInterface : class, IZendeskThing, ITrackable
         where TModel : TrackableZendeskThingBase, TInterface, new()
     {
         protected ModelFixture<TJson, TModel> ModelFixture { get; private set; }
@@ -39,9 +39,9 @@
         [Fact]
         public void CanDeserialize()
         {
-            // arrange
-            var deserializer = new JsonDeserializer();            
+            // arrange                        
             var response = new RestResponse { Content = this.ModelFixture.SerializedJsonObject };
+            var deserializer = new ZendeskThingJsonDeserializer();
 
             // act
             var actualModel = deserializer.Deserialize<TModel>(response);
@@ -61,12 +61,11 @@
         public void CanDeserializePage()
         {
             // arrange            
-            var deserializer = new JsonDeserializer();
-            var container = new UnityContainer();             
-            deserializer.Container.Register(typeof(IPage<TModel>), typeof(TicketsPage));
+            var deserializer = new ZendeskThingJsonDeserializer();                        
+            //deserializer.Container.Register(typeof(IPage<TModel>), typeof(TicketsPage));
             var response = new RestResponse { Content = this.ModelFixture.SerializedPage };
 
-            var actualModel = deserializer.Deserialize<IPage<TModel>>(response);
+            var actualModel = deserializer.Deserialize<IPage<TInterface>>(response);
 
             actualModel.Collection.Should().HaveCount(3);
             actualModel.Count.ShouldBeGreaterThan(0);
