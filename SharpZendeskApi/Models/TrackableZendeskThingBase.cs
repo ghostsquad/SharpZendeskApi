@@ -1,33 +1,46 @@
 ﻿namespace SharpZendeskApi.Models
 {
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
     using System.Runtime.CompilerServices;
 
-    using SharpZendeskApi.Models.Attributes;
+    using Newtonsoft.Json;
 
-    public abstract class TrackableZendeskThingBase : IZendeskThing
+    public abstract class TrackableZendeskThingBase : IZendeskThing, ITrackable
     {
         #region Constructors and Destructors
 
-        public TrackableZendeskThingBase()
+        protected TrackableZendeskThingBase()
         {
-            this.ChangedProperties = new HashSet<string>();
+            this.ChangedPropertiesSet = new HashSet<string>();
         }
 
         #endregion
 
         #region Public Properties
 
-        [ReadOnly]
+        [JsonIgnore]
+        public IEnumerable<string> ChangedProperties
+        {
+            get
+            {
+                return this.ChangedPropertiesSet.ToList();
+            }
+        }
+
+        [Attributes.ReadOnly]
         public int? Id { get; set; }
+
+        [JsonIgnore]
+        public bool WasSubmitted { get; internal set; }
 
         #endregion
 
         #region Properties
 
-        internal HashSet<string> ChangedProperties { get; set; }
-
-        internal bool WasSubmitted { get; set; }
+        internal HashSet<string> ChangedPropertiesSet { get; set; }
 
         #endregion
 
@@ -39,9 +52,14 @@
             {
                 if (propertyName != null && !this.ChangedProperties.Contains(propertyName))
                 {
-                    this.ChangedProperties.Add(propertyName);
+                    this.ChangedPropertiesSet.Add(propertyName);
                 }
             }
+        }
+
+        protected void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            this.NotifyPropertyChanged(propertyChangedEventArgs.PropertyName);
         }
 
         #endregion

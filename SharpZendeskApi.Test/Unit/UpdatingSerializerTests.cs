@@ -66,7 +66,7 @@
             const string ExpectedChangedProperty = "foo";
             var thing =
                 Mock.Of<TrackableZendeskThingBase>(
-                    x => x.ChangedProperties == new HashSet<string> { ExpectedChangedProperty });
+                    x => x.ChangedPropertiesSet == new HashSet<string> { ExpectedChangedProperty });
 
             // act
             this.serializer.Serialize(thing);
@@ -94,7 +94,7 @@
             var json = this.serializer.Serialize(new FakeZendeskThing
                                                      {
                                                          WasSubmitted = true,
-                                                         ChangedProperties = new HashSet<string> { "Foo" }
+                                                         ChangedPropertiesSet = new HashSet<string> { "Foo" }
                                                      });
 
             // assert

@@ -62,7 +62,10 @@
     <Compile Include="CreationSerializer.cs" />
     <Compile Include="IZendeskClient.cs" />
     <Compile Include="IZendeskSerializer.cs" />
+    <Compile Include="Management\AttachmentManager.cs" />
     <Compile Include="Management\ManagerBase.cs" />
+    <Compile Include="Management\UserManager.cs" />
+    <Compile Include="Management\ViewManager.cs" />
     <Compile Include="Models\IAttachment.cs" />
     <Compile Include="Models\ISatisfactionRating.cs" />
     <Compile Include="Models\IThumbnail.cs" />
@@ -70,6 +73,7 @@
     <Compile Include="Models\ITicketComment.cs" />
     <Compile Include="Models\ITicketField.cs" />
     <Compile Include="Models\ITrackable.cs" />
+    <Compile Include="Models\IUpload.cs" />
     <Compile Include="Models\IUser.cs" />
     <Compile Include="Models\IView.cs" />
     <Compile Include="Models\TrackableZendeskThingBase.cs" />
@@ -89,6 +93,10 @@
     <Compile Include="Models\Attributes\AdminOnlyAttribute.cs" />
     <Compile Include="Models\Restriction.cs" />
     <Compile Include="Exceptions\MandatoryPropertyNullValueException.cs" />
+    <Compile Include="Models\Upload.cs" />
+    <Compile Include="Models\UserPage.cs" />
+    <Compile Include="Models\ViewOutput.cs" />
+    <Compile Include="Models\ViewPage.cs" />
     <Compile Include="ResponseExtensions.cs" />
     <Compile Include="SerializationScenario.cs" />
     <Compile Include="UpdatingSerializer.cs" />

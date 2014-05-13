@@ -48,7 +48,7 @@ namespace SharpZendeskApi
 
         public string Serialize(TrackableZendeskThingBase zendeskThing)
         {
-            this.Resolver.Customize(new IncludeOnlyChangedPropertiesCustomization(zendeskThing.ChangedProperties));
+            this.Resolver.Customize(new IncludeOnlyChangedPropertiesCustomization(zendeskThing.ChangedPropertiesSet));
 
             var jsonBody = JsonConvert.SerializeObject(zendeskThing, this.Settings);
             var jsonBodyWrapped = jsonBody.WrapSerializedStringInTypeRoot(zendeskThing.GetType());

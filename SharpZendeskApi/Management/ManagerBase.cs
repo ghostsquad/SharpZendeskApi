@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.Practices.Unity;
 
@@ -10,14 +11,14 @@
     using SharpZendeskApi.Models;
 
     public abstract class ManagerBase<TModel, TInterface> : IManager<TInterface>
-        where TInterface : IZendeskThing, ITrackable
-        where TModel : TrackableZendeskThingBase, TInterface
+        where TInterface : class, IZendeskThing, ITrackable where TModel : TrackableZendeskThingBase, TInterface
     {
         #region Constructors and Destructors
 
         protected ManagerBase(IZendeskClient client)
         {
             this.Client = client;
+            this.PluralizedModelName = typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize();
         }
 
         #endregion
@@ -25,6 +26,12 @@
         #region Public Properties
 
         public IZendeskClient Client { get; set; }
+
+        #endregion
+
+        #region Properties
+
+        protected string PluralizedModelName { get; private set; }
 
         #endregion
 
@@ -83,7 +90,7 @@
             return new Listing<TModel, TInterface>(this.Client, request);
         }
 
-        protected TInterface SubmitNew(string url, TrackableZendeskThingBase obj)
+        protected TInterface SubmitNew(string url, TInterface obj)
         {
             if (obj == null)
             {
@@ -93,13 +100,15 @@
             obj.ThrowIfSubmitted();
             obj.ThrowIfAnyMandatoryPropertyIsNull();
 
+            var objAsModel = obj as TModel;
+
             var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Create.ToString());
 
-            var jsonBody = handler.Serialize(obj);
+            var jsonBody = handler.Serialize(objAsModel);
 
             var request = new RestRequest(url, Method.POST)
                               {
-                                  RequestFormat = DataFormat.Json,
+                                  RequestFormat = DataFormat.Json, 
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 
@@ -108,26 +117,28 @@
 
             response.ThrowIfProblem();
 
-            obj.WasSubmitted = true;
+            objAsModel.WasSubmitted = true;
 
             return response.Data;
         }
 
-        protected void SubmitUpdatesFor(string url, TModel obj)
+        protected void SubmitUpdatesFor(string url, TInterface obj)
         {
             obj.ThrowIfNotSubmitted();
 
-            if (obj.ChangedProperties.Count == 0)
+            if (!obj.ChangedProperties.Any())
             {
                 return;
             }
 
+            var objAsModel = obj as TModel;
+
             var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Update.ToString());
-            var jsonBody = handler.Serialize(obj);
+            var jsonBody = handler.Serialize(objAsModel);
 
             var request = new RestRequest(url, Method.PUT)
                               {
-                                  RequestFormat = DataFormat.Json,
+                                  RequestFormat = DataFormat.Json, 
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 

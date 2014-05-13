@@ -120,7 +120,7 @@
         /// <summary>
         /// Gets or sets the tags.
         /// </summary>
-        IList<string> Tags { get; set; }
+        IEnumerable<string> Tags { get; set; }
 
         /// <summary>
         /// Gets or sets the ticket restriction.
@@ -135,7 +135,7 @@
         /// <summary>
         /// Gets or sets the user fields.
         /// </summary>
-        IList<CustomField> UserFields { get; set; }
+        IEnumerable<CustomField> UserFields { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether verified.

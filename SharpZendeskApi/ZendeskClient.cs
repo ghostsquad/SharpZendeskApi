@@ -36,7 +36,7 @@
             string emailAddress,
             string passwordOrToken,
             ZendeskAuthenticationMethod authenticationMethod)
-        {            
+        {
             if (authenticationMethod == ZendeskAuthenticationMethod.Token)
             {
                 // per http://developer.zendesk.com/documentation/rest_api/introduction.html
@@ -54,7 +54,7 @@
 
             this.Container = new UnityContainer();
 
-            var deserializer = new JsonDeserializer();
+            var deserializer = new ZendeskThingJsonDeserializer();
 
             this.ClearHandlers();
             this.AddHandler("application/json", deserializer);

@@ -12,24 +12,26 @@
         /// </summary>
         bool? Active { get; set; }
 
-        IList<Condition> All { get; set; }
+        IEnumerable<Condition> All { get; set; }
 
-        IList<Condition> Any { get; set; }
+        IEnumerable<Condition> Any { get; set; }
 
         /// <summary>
         ///     Gets or sets the conditions.
         /// </summary>
-        Conditions Conditions { get; set; }
+        Conditions Conditions { get; }
 
         /// <summary>
         ///     Gets or sets the execution.
         /// </summary>
-        Execution Execution { get; set; }
+        Execution Execution { get; }
 
         /// <summary>
         ///     Gets or sets the restriction.
         /// </summary>
         Restriction Restriction { get; set; }
+
+        ViewOutput Output { get; set; }
 
         /// <summary>
         ///     Gets or sets the sla id.
@@ -41,10 +43,8 @@
         /// </summary>
         string Title { get; set; }
 
-        [ReadOnly]
         DateTime? UpdatedAt { get; }
-
-        [ReadOnly]
+        
         DateTime? CreatedAt { get; }
     }
 }

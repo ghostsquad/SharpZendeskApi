@@ -42,7 +42,7 @@
             // easy way to populate this with your test classes in PowerShell
             // cd .\SharpZendeskApi\SharpZendeskApi.Core.Test\Common\JsonObjects
             // Get-ChildItem | ?{$_.Name -like "*Json.cs"} | %{Write-Host "this.Register<$($_.BaseName)>();"}
-            this.Register<AttachmentJson>();            
+            this.Register<AttachmentJson>();
             this.Register<ConditionJson>();
             this.Register<ConditionsJson>();
             this.Register<CustomFieldJson>();
@@ -54,10 +54,15 @@
             this.Register<TicketCommentJson>();
             this.Register<TicketFieldJson>();
             this.Register<TicketJson>();
-            this.Register<PageJson<TicketJson, Ticket>>();
             this.Register<UserJson>();
             this.Register<ViaJson>();
-            this.Register<ViewJson>();                        
+            this.Register<ViewJson>();
+            this.Register<ViewOutputJson>();
+
+            // pages
+            this.Register<PageJson<TicketJson, Ticket>>();
+            this.Register<PageJson<UserJson, User>>();
+            this.Register<PageJson<ViewJson, View>>();
         }
 
         #endregion

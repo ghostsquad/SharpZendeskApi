@@ -1,6 +1,5 @@
 ﻿// .\GetZendeskModelDataFromUrl.ps1 http://developer.zendesk.com/documentation/rest_api/users.html
 // End users are represented as JSON objects which have the following keys:
-// 
 // Name            Type       ReadOnly Mandatory Comment
 // ----            ----       -------- --------- -------
 // created_at      date       yes      no        The time the user was created
@@ -18,9 +17,7 @@
 // url             string     yes      no        The API url of this user
 // verified        boolean    no       no        Zendesk has verified that this user is who he says he is
 // 
-// 
 // Users are represented as JSON objects which have the following keys:
-// 
 // Name                  Type       ReadOnly Mandatory Comment
 // ----                  ----       -------- --------- -------
 // active                boolean    yes      no        Users that have been deleted will have the value false here
@@ -61,14 +58,67 @@ namespace SharpZendeskApi.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.Practices.Unity;
+
+    using SharpZendeskApi.Models.Attributes;
 
     /// <summary>
     /// The user.
     /// </summary>
     public class User : TrackableZendeskThingBase, IUser
     {
+        #region Fields
+
+        private string alias;
+
+        private int? customRoleId;
+
+        private string details;
+
+        private string email;
+
+        private string externalId;
+
+        private int? localeId;
+
+        private bool? moderator;
+
+        private string name;
+
+        private string notes;
+
+        private bool? onlyPrivateComments;
+
+        private int? organizationId;
+
+        private string phone;
+
+        private IAttachment photo;
+
+        private bool? restrictedAgent;
+
+        private string role;
+
+        private string signature;
+
+        private bool? suspended;
+
+        private string[] tags;
+
+        private string ticketRestriction;
+
+        private string timeZone;
+
+        private CustomField[] userFields;
+
+        private bool? verified;
+
+        #endregion
+
+        #region Constructors and Destructors
+
         public User(string email, string name, string role)
         {
             this.Email = email;
@@ -78,160 +128,437 @@ namespace SharpZendeskApi.Models
 
         [InjectionConstructor]
         public User()
-        {            
+        {
         }
+
+        #endregion
 
         #region Public Properties
 
         /// <summary>
         /// Gets or sets a value indicating whether active.
         /// </summary>
+        [ReadOnly]
         public bool? Active { get; set; }
 
         /// <summary>
         /// Gets or sets the alias.
         /// </summary>
-        public string Alias { get; set; }
+        public string Alias
+        {
+            get
+            {
+                return this.alias;
+            }
+
+            set
+            {
+                this.alias = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the created at.
         /// </summary>
+        [ReadOnly]
         public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the custom role id.
         /// </summary>
-        public int? CustomRoleId { get; set; }
+        public int? CustomRoleId
+        {
+            get
+            {
+                return this.customRoleId;
+            }
+
+            set
+            {
+                this.customRoleId = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the details.
         /// </summary>
-        public string Details { get; set; }
+        public string Details
+        {
+            get
+            {
+                return this.details;
+            }
+
+            set
+            {
+                this.details = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the email.
         /// </summary>
-        public string Email { get; set; }
+        [Mandatory]
+        public string Email
+        {
+            get
+            {
+                return this.email;
+            }
+
+            set
+            {
+                this.email = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the external id.
         /// </summary>
-        public string ExternalId { get; set; }
+        public string ExternalId
+        {
+            get
+            {
+                return this.externalId;
+            }
+
+            set
+            {
+                this.externalId = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the last login at.
         /// </summary>
+        [ReadOnly]
         public DateTime? LastLoginAt { get; set; }
 
         /// <summary>
         /// Gets or sets the locale.
         /// </summary>
+        [ReadOnly]
         public string Locale { get; set; }
 
         /// <summary>
         /// Gets or sets the locale id.
         /// </summary>
-        public int? LocaleId { get; set; }
+        public int? LocaleId
+        {
+            get
+            {
+                return this.localeId;
+            }
+
+            set
+            {
+                this.localeId = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether moderator.
         /// </summary>
-        public bool? Moderator { get; set; }
+        public bool? Moderator
+        {
+            get
+            {
+                return this.moderator;
+            }
+
+            set
+            {
+                this.moderator = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public string Name { get; set; }
+        [Mandatory]
+        public string Name
+        {
+            get
+            {
+                return this.name;
+            }
+
+            set
+            {
+                this.name = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the notes.
         /// </summary>
-        public string Notes { get; set; }
+        public string Notes
+        {
+            get
+            {
+                return this.notes;
+            }
+
+            set
+            {
+                this.notes = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether only private comments.
         /// </summary>
-        public bool? OnlyPrivateComments { get; set; }
+        public bool? OnlyPrivateComments
+        {
+            get
+            {
+                return this.onlyPrivateComments;
+            }
+
+            set
+            {
+                this.onlyPrivateComments = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the organization id.
         /// </summary>
-        public int? OrganizationId { get; set; }
+        public int? OrganizationId
+        {
+            get
+            {
+                return this.organizationId;
+            }
+
+            set
+            {
+                this.organizationId = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the phone.
         /// </summary>
-        public string Phone { get; set; }
+        public string Phone
+        {
+            get
+            {
+                return this.phone;
+            }
+
+            set
+            {
+                this.phone = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the photo.
         /// </summary>
-        public IAttachment Photo { get; set; }
+        public IAttachment Photo
+        {
+            get
+            {
+                return this.photo;
+            }
+
+            set
+            {
+                this.photo = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether restricted agent.
         /// </summary>
-        public bool? RestrictedAgent { get; set; }
+        public bool? RestrictedAgent
+        {
+            get
+            {
+                return this.restrictedAgent;
+            }
+
+            set
+            {
+                this.restrictedAgent = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the role.
         /// </summary>
-        public string Role { get; set; }
+        [Mandatory]
+        public string Role
+        {
+            get
+            {
+                return this.role;
+            }
+
+            set
+            {
+                this.role = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether shared.
         /// </summary>
+        [ReadOnly]
         public bool? Shared { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether shared agent.
         /// </summary>
+        [ReadOnly]
         public bool? SharedAgent { get; set; }
 
         /// <summary>
         /// Gets or sets the signature.
         /// </summary>
-        public string Signature { get; set; }
+        public string Signature
+        {
+            get
+            {
+                return this.signature;
+            }
+
+            set
+            {
+                this.signature = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether suspended.
         /// </summary>
-        public bool? Suspended { get; set; }
+        public bool? Suspended
+        {
+            get
+            {
+                return this.suspended;
+            }
+
+            set
+            {
+                this.suspended = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the tags.
         /// </summary>
-        public IList<string> Tags { get; set; }
+        public IEnumerable<string> Tags
+        {
+            get
+            {
+                return this.tags != null ? this.tags.ToArray() : null;
+            }
+
+            set
+            {
+                this.tags = value != null ? value.ToArray() : new string[0];
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the ticket restriction.
         /// </summary>
-        public string TicketRestriction { get; set; }
+        public string TicketRestriction
+        {
+            get
+            {
+                return this.ticketRestriction;
+            }
+
+            set
+            {
+                this.ticketRestriction = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the time zone.
         /// </summary>
-        public string TimeZone { get; set; }
+        public string TimeZone
+        {
+            get
+            {
+                return this.timeZone;
+            }
+
+            set
+            {
+                this.timeZone = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the updated at.
         /// </summary>
+        [ReadOnly]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the url.
         /// </summary>
+        [ReadOnly]
         public string Url { get; set; }
 
         /// <summary>
         /// Gets or sets the user fields.
         /// </summary>
-        public IList<CustomField> UserFields { get; set; }
+        public IEnumerable<CustomField> UserFields
+        {
+            get
+            {
+                return this.userFields != null ? this.userFields.ToArray() : null;
+            }
+
+            set
+            {
+                this.userFields = value != null ? value.ToArray() : new CustomField[0];
+                this.NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether verified.
         /// </summary>
-        public bool? Verified { get; set; }
+        public bool? Verified
+        {
+            get
+            {
+                return this.verified;
+            }
+
+            set
+            {
+                this.verified = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         #endregion
     }

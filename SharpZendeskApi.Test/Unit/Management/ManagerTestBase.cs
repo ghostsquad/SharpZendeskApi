@@ -123,10 +123,10 @@
         }
 
         [Fact]
-        public void SubmimtUpdatesFor_WhenNotSubmittedObject_ExpectSharpZendeskException()
+        public void SubmitUpdatesFor_WhenNotSubmittedObject_ExpectSharpZendeskException()
         {
             // arrange
-            var model = new TModel();
+            var model = new TModel { Id = 1 };
 
             // act & assert
             this.Manager.Invoking(x => x.SubmitUpdatesFor(model))
@@ -138,7 +138,7 @@
         public void SubmitUpdatesFor_WhenNoChangedProperties_ExpectNoChange()
         {
             // arrange
-            var model = new TModel { WasSubmitted = true };
+            var model = new TModel { WasSubmitted = true, Id = 1 };
             this.ClientMock.Setup(x => x.Execute(It.IsAny<IRestRequest>())).Verifiable();
 
             // act
@@ -149,7 +149,7 @@
         }
 
         [Fact]
-        public void SubmitNew_GivenObjectWithNullMandatoryProperties_ExpectMandatoryPropertyNullValueException()
+        public virtual void SubmitNew_GivenObjectWithNullMandatoryProperties_ExpectMandatoryPropertyNullValueException()
         {
             // arrange
             var model = new TModel();
@@ -194,7 +194,7 @@
             var modelAsTrackable = model as TrackableZendeskThingBase;
             modelAsTrackable.Id = 1;
             modelAsTrackable.WasSubmitted = true;
-            modelAsTrackable.ChangedProperties.Add("foo");
+            modelAsTrackable.ChangedPropertiesSet.Add("foo");
 
             this.SetupOkResponse();
 
@@ -213,7 +213,8 @@
 
             this.ClientMock.Object.Container.RegisterInstance(SerializationScenario.Update.ToString(), serializerMock.Object);
 
-            const string ExpectedResource = "tickets/1.json";
+            var pluralizedModel = (typeof(TModel).Name + "s").ToCPlusPlusNamingStyle();
+            var expectedResource = pluralizedModel + "/1.json";
 
             // act
             this.Manager.SubmitUpdatesFor(model);
@@ -221,7 +222,7 @@
             // assert
             actualRequest.Should().NotBeNull();
             actualRequest.Method.Should().Be(Method.PUT);
-            actualRequest.Resource.Should().Be(ExpectedResource);
+            actualRequest.Resource.Should().Be(expectedResource);
             actualRequest.Parameters.First(x => x.Type == ParameterType.RequestBody).Value.Should().Be(ExpectedJsonBody);
             actualSerializedObject.ShouldBeSameAs(model);
         }
