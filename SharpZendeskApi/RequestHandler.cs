@@ -22,7 +22,7 @@ namespace SharpZendeskApi
             var response = this.client.Execute<T>(request);
             ThrowIfNoDataOrProblem(response);
             return response.Data;
-        }        
+        }
 
         public void MakeRequest(IRestRequest request)
         {
@@ -80,12 +80,16 @@ namespace SharpZendeskApi
                 throw new ZendeskRequestException(response.Content, response.Request, response.StatusCode);
             }
 
-            if (response.Request.Method == Method.PUT && response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.NotModified)
+            if (response.Request.Method == Method.PUT
+                && response.StatusCode != HttpStatusCode.OK
+                && response.StatusCode != HttpStatusCode.NotModified)
             {
                 throw new ZendeskRequestException(response.Content, response.Request, response.StatusCode);
             }
 
-            if (response.Request.Method == Method.DELETE && response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.NoContent)
+            if (response.Request.Method == Method.DELETE
+                && response.StatusCode != HttpStatusCode.OK
+                && response.StatusCode != HttpStatusCode.NoContent)
             {
                 throw new ZendeskRequestException(response.Content, response.Request, response.StatusCode);
             } 

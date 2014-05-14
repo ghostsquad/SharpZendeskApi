@@ -32,13 +32,13 @@
 
         #region Fields
 
-        private Mock<IRestClient> clientMock = new Mock<IRestClient>(MockBehavior.Strict);
+        private readonly Mock<ZendeskClientBase> clientMock = new Mock<ZendeskClientBase>(MockBehavior.Strict);
 
-        private IFixture fixture = new Fixture().Customize(new AutoMoqCustomization());
+        private readonly IFixture fixture = new Fixture().Customize(new AutoMoqCustomization());
+
+        private readonly List<IRestResponse<IPage<Ticket>>> responses = new List<IRestResponse<IPage<Ticket>>>();
 
         private int responseIndex = 0;
-
-        private List<IRestResponse<IPage<Ticket>>> responses = new List<IRestResponse<IPage<Ticket>>>();
 
         #endregion
 

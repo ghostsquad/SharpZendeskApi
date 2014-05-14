@@ -38,8 +38,7 @@
 
         protected ManagerTestBase()
         {
-            this.ClientMock = new Mock<IZendeskClient>();
-            this.ClientMock.SetupProperty(x => x.Container, new UnityContainer());
+            this.ClientMock = new Mock<ZendeskClientBase>();            
             this.ResponseMock = new Mock<IRestResponse<TModel>>();
             this.Manager = (TManager)Activator.CreateInstance(typeof(TManager), this.ClientMock.Object);
         }
@@ -48,7 +47,7 @@
 
         #region Properties
 
-        protected Mock<IZendeskClient> ClientMock { get; set; }
+        protected Mock<ZendeskClientBase> ClientMock { get; set; }
 
         protected IManager<TInterface> Manager { get; set; }
 
@@ -211,7 +210,7 @@
                 .Returns(ExpectedJsonBody)
                 .Verifiable();
 
-            this.ClientMock.Object.Container.RegisterInstance(SerializationScenario.Update.ToString(), serializerMock.Object);
+            //this.ClientMock.Object.Container.RegisterInstance(SerializationScenario.Update.ToString(), serializerMock.Object);
 
             var pluralizedModel = (typeof(TModel).Name + "s").ToCPlusPlusNamingStyle();
             var expectedResource = pluralizedModel + "/1.json";

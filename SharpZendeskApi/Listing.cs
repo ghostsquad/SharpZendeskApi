@@ -212,8 +212,8 @@
 
                 this.lastRequest = nextRequest;
 
-                var result = this.listing.Client.RequestHandler.MakeRequest<IPage<TModel>>(this.lastRequest);                
-                
+                var result = this.listing.Client.RequestHandler.MakeRequest<IPage<TModel>>(this.lastRequest);
+
                 this.currentIndexWithinPage = 0;
                 this.currentPageCollection = result.Collection.ToArray();
                 this.currentPageCollectionCount = this.currentPageCollection.Count();

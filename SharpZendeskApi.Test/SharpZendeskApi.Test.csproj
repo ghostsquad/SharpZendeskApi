@@ -127,6 +127,7 @@
     <Compile Include="Common\JsonObjects\ViewJson.cs" />
     <Compile Include="Common\JsonObjects\ViewOutputJson.cs" />
     <Compile Include="Common\RespectOnlyReadOnlyPropertiesSpecimenCustomization.cs" />
+    <Compile Include="Common\Testable.cs" />
     <Compile Include="End2End\TicketTests.cs" />
     <Compile Include="Fakes\ExcludeAttributeCustomization.cs" />
     <Compile Include="Fakes\FakeZendeskThing.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Unit\Management\ViewManagerTests.cs" />
     <Compile Include="Unit\Models\UserTests.cs" />
     <Compile Include="Unit\Models\ViewTests.cs" />
+    <Compile Include="Unit\RequestHandlerTests.cs" />
     <Compile Include="Unit\ResponseExtensionTests.cs" />
     <Compile Include="Unit\Models\ModelFixture.cs" />
     <Compile Include="Unit\Models\ModelTestBase.cs" />

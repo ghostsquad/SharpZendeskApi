@@ -93,9 +93,7 @@
             serializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
                     .Callback<TrackableZendeskThingBase>(x => actualSerializedObject = x)
                     .Returns(ExpectedJsonBody)
-                    .Verifiable();
-
-            this.ClientMock.Object.Container.RegisterInstance(SerializationScenario.Create.ToString(), serializerMock.Object);
+                    .Verifiable();            
 
             const string ExpectedResource = "tickets.json";
 
