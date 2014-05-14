@@ -20,7 +20,7 @@ namespace SharpZendeskApi.Management
 
         private const string CompactListEndpoint = "views/compact.json";
 
-        public ViewManager(IZendeskClient client)
+        public ViewManager(ZendeskClientBase client)
             : base(client)
         {
         }

@@ -23,7 +23,7 @@
 
         #region Constructors and Destructors
 
-        internal Listing(IRestClient client, IRestRequest request)
+        internal Listing(ZendeskClientBase client, IRestRequest request)
         {
             this.Client = client;
             this.Request = request;
@@ -47,7 +47,7 @@
 
         #region Properties
 
-        private IRestClient Client { get; set; }
+        private ZendeskClientBase Client { get; set; }
 
         private IRestRequest Request { get; set; }
 
@@ -212,15 +212,13 @@
 
                 this.lastRequest = nextRequest;
 
-                var response = this.listing.Client.Execute<IPage<TModel>>(this.lastRequest);
-
-                response.ThrowIfProblem();
+                var result = this.listing.Client.RequestHandler.MakeRequest<IPage<TModel>>(this.lastRequest);                
                 
                 this.currentIndexWithinPage = 0;
-                this.currentPageCollection = response.Data.Collection.ToArray();
+                this.currentPageCollection = result.Collection.ToArray();
                 this.currentPageCollectionCount = this.currentPageCollection.Count();
-                this.totalCount = response.Data.Count;
-                this.isNextPageAvailable = response.Data.NextPage != null;
+                this.totalCount = result.Count;
+                this.isNextPageAvailable = result.NextPage != null;
                 this.listing.PreviousPage = this.currentPageNumber <= 1 ? null : new int?(this.currentPageNumber - 1);
                 this.listing.NextPage = this.isNextPageAvailable ? new int?(this.currentPageNumber + 1) : null;
                 this.SetAtEndOfPage();

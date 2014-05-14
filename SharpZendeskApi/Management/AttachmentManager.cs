@@ -13,7 +13,7 @@
         private const string SingleEndpoint = "attachments/{0}.json";
 
 
-        public AttachmentManager(IZendeskClient client)
+        public AttachmentManager(ZendeskClientBase client)
             : base(client)
         {
         }

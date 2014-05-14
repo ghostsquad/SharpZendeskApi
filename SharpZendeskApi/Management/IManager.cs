@@ -6,8 +6,8 @@
 
     public interface IManager<TInterface>
         where TInterface : IZendeskThing, ITrackable
-    {        
-        IZendeskClient Client { get; set; }
+    {
+        ZendeskClientBase Client { get; }
 
         IListing<TInterface> GetMany(IEnumerable<int> ids);
 

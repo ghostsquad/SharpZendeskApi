@@ -13,9 +13,9 @@
     public abstract class ManagerBase<TModel, TInterface> : IManager<TInterface>
         where TInterface : class, IZendeskThing, ITrackable where TModel : TrackableZendeskThingBase, TInterface
     {
-        #region Constructors and Destructors
+        #region Constructors and Destructors               
 
-        protected ManagerBase(IZendeskClient client)
+        protected ManagerBase(ZendeskClientBase client)
         {
             this.Client = client;
             this.PluralizedModelName = typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize();
@@ -25,7 +25,7 @@
 
         #region Public Properties
 
-        public IZendeskClient Client { get; set; }
+        public ZendeskClientBase Client { get; set; }
 
         #endregion
 
@@ -70,11 +70,7 @@
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 
-            var response = this.Client.Execute<TModel>(request);
-
-            response.ThrowIfProblem();
-
-            return response.Data;
+            return this.Client.RequestHandler.MakeRequest<TInterface>(request);
         }
 
         protected virtual IListing<TInterface> GetMany(string url)
@@ -82,9 +78,7 @@
             // http://developer.zendesk.com/documentation/rest_api/tickets.html#show-multiple-tickets
             var request = new RestRequest(url, Method.GET)
                               {
-                                  RootElement =
-                                      typeof(TModel).GetTypeNameAsCPlusPlusStyle()
-                                      .Pluralize()
+                                  RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize()
                               };
 
             return new Listing<TModel, TInterface>(this.Client, request);
@@ -102,9 +96,8 @@
 
             var objAsModel = obj as TModel;
 
-            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Create.ToString());
-
-            var jsonBody = handler.Serialize(objAsModel);
+            var serializer = this.Client.GetSerializer(SerializationScenario.Create);
+            var jsonBody = serializer.Serialize(objAsModel);
 
             var request = new RestRequest(url, Method.POST)
                               {
@@ -113,13 +106,11 @@
                               };
 
             request.AddBody(jsonBody);
-            var response = this.Client.Execute<TModel>(request);
 
-            response.ThrowIfProblem();
+            var submittedObject = this.Client.RequestHandler.MakeRequest<TModel>(request);
+            submittedObject.WasSubmitted = true;
 
-            objAsModel.WasSubmitted = true;
-
-            return response.Data;
+            return submittedObject;
         }
 
         protected void SubmitUpdatesFor(string url, TInterface obj)
@@ -133,8 +124,8 @@
 
             var objAsModel = obj as TModel;
 
-            var handler = this.Client.Container.Resolve<IZendeskSerializer>(SerializationScenario.Update.ToString());
-            var jsonBody = handler.Serialize(objAsModel);
+            var serializer = this.Client.GetSerializer(SerializationScenario.Update);
+            var jsonBody = serializer.Serialize(objAsModel);
 
             var request = new RestRequest(url, Method.PUT)
                               {
@@ -143,9 +134,7 @@
                               };
 
             request.AddBody(jsonBody);
-            var response = this.Client.Execute<TModel>(request);
-
-            response.ThrowIfProblem();
+            this.Client.RequestHandler.MakeRequest<TModel>(request);
         }
 
         #endregion

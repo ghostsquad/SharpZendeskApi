@@ -25,7 +25,7 @@
 
         #region Constructors and Destructors
 
-        public UserManager(IZendeskClient client)
+        public UserManager(ZendeskClientBase client)
             : base(client)
         {
         }

@@ -12,7 +12,7 @@
     /// <summary>
     /// The sharp zendesk api client.
     /// </summary>
-    public sealed class ZendeskClient : RestClient, IZendeskClient
+    public sealed class ZendeskClient : ZendeskClientBase
     {        
         #region Constructors and Destructors
 
@@ -45,34 +45,19 @@
                 emailAddress += "/token";
             }
 
-            this.Timeout = 30000;
-            this.MaxRedirects = 10;
-
             var domainUri = new Uri(domain);
             var apiUri = new Uri(domainUri, "api/v2");
 
             this.UserAgent = "SharpZendeskApi";
             this.BaseUrl = apiUri.AbsoluteUri;
-            this.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);
-
-            this.Container = new UnityContainer();
+            this.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);            
 
             var deserializer = new ZendeskThingJsonDeserializer();
 
             this.ClearHandlers();
             this.AddHandler("application/json", deserializer);
             this.AddHandler("test/json", deserializer);
-
-            // register default serializers
-            this.Container.RegisterType<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
-            this.Container.RegisterType<IZendeskSerializer, UpdatingSerializer>(SerializationScenario.Update.ToString());
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public IUnityContainer Container { get; set; }
 
         #endregion
     }

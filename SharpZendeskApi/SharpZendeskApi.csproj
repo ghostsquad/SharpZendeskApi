@@ -60,7 +60,9 @@
     <Compile Include="ContractResolution\ExcludeReadOnlyUnlessMandatoryCustomization.cs" />
     <Compile Include="ContractResolution\IncludeOnlyChangedPropertiesCustomization.cs" />
     <Compile Include="CreationSerializer.cs" />
-    <Compile Include="IZendeskClient.cs" />
+    <Compile Include="IRequestHandler.cs" />
+    <Compile Include="RequestHandler.cs" />
+    <Compile Include="ZendeskClientBase.cs" />
     <Compile Include="IZendeskSerializer.cs" />
     <Compile Include="Management\AttachmentManager.cs" />
     <Compile Include="Management\ManagerBase.cs" />
@@ -97,7 +99,6 @@
     <Compile Include="Models\UserPage.cs" />
     <Compile Include="Models\ViewOutput.cs" />
     <Compile Include="Models\ViewPage.cs" />
-    <Compile Include="ResponseExtensions.cs" />
     <Compile Include="SerializationScenario.cs" />
     <Compile Include="UpdatingSerializer.cs" />
     <Compile Include="ZendeskClient.cs" />

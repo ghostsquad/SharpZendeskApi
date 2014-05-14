@@ -17,7 +17,7 @@
 
         private const string SubmitTicketEndpoint = "tickets.json";
 
-        public TicketManager(IZendeskClient client) : base(client)
+        public TicketManager(ZendeskClientBase client) : base(client)
         {                       
         }        
 
