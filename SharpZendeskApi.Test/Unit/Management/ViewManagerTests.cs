@@ -38,7 +38,7 @@ namespace SharpZendeskApi.Test.Unit.Management
             var pageResponse = this.GetPageResponse(2);
 
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<View>>(It.IsAny<IRestRequest>()))
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<View>>(It.IsAny<IRestRequest>()))
                 .Returns(pageResponse)
                 .Callback<IRestRequest>(r => actualRequest = r);
 
@@ -57,7 +57,7 @@ namespace SharpZendeskApi.Test.Unit.Management
             actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
 
-            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Data.Collection);
+            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
         }
     }
 }

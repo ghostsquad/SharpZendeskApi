@@ -2,18 +2,28 @@
 {
     using System;
 
-    using Microsoft.Practices.Unity;
-
     using RestSharp;
 
-    using SharpZendeskApi.Models;
-
-    public abstract class ZendeskClientBase : RestClient
+    public abstract class ZendeskClientBase
     {
+        #region Constructors and Destructors
+
         protected ZendeskClientBase()
         {
-            this.RequestHandler = new RequestHandler(this);
+            this.RestClient = new RestClient();
         }
+
+        #endregion
+
+        #region Properties
+
+        internal virtual IRequestHandler RequestHandler { get; set; }
+
+        protected RestClient RestClient { get; private set; }
+
+        #endregion
+
+        #region Methods
 
         internal virtual IZendeskSerializer GetSerializer(SerializationScenario scenario)
         {
@@ -23,17 +33,19 @@
                     {
                         return new CreationSerializer();
                     }
+
                 case SerializationScenario.Update:
                     {
                         return new UpdatingSerializer();
                     }
+
                 default:
                     {
                         throw new ArgumentException("Unknown Scenario: " + scenario);
                     }
             }
-        }        
+        }
 
-        internal virtual IRequestHandler RequestHandler { get; private set; }
+        #endregion
     }
 }

@@ -13,17 +13,19 @@
     using Moq;
 
     using Ploeh.AutoFixture;
+    using Ploeh.AutoFixture.AutoMoq;
 
     using RestSharp;
 
     using SharpZendeskApi.Exceptions;
     using SharpZendeskApi.Management;
-    using SharpZendeskApi.Models;    
+    using SharpZendeskApi.Models;
+    using SharpZendeskApi.Test.Common;
 
     using Xunit;
     using Xunit.Should;
 
-    public abstract class ManagerTestBase<TModel, TInterface, TManager> : IUseFixture<ManagerFixture<TModel>>
+    public abstract class ManagerTestBase<TModel, TInterface, TManager>
         where TModel : TrackableZendeskThingBase, TInterface, new()
         where TInterface : class, IZendeskThing, ITrackable
         where TManager : class, IManager<TInterface>
@@ -34,13 +36,15 @@
 
         #endregion
 
+        protected Testable<TManager> testable = new Testable<TManager>();
+
         #region Constructors and Destructors
 
         protected ManagerTestBase()
         {
-            this.ClientMock = new Mock<ZendeskClientBase>();            
-            this.ResponseMock = new Mock<IRestResponse<TModel>>();
-            this.Manager = (TManager)Activator.CreateInstance(typeof(TManager), this.ClientMock.Object);
+            this.RequestHandlerMock = new Mock<IRequestHandler>();
+            this.ClientMock = new Mock<ZendeskClientBase>()
+                .SetupProperty(x => x.RequestHandler, this.RequestHandlerMock.Object);
         }
 
         #endregion
@@ -49,11 +53,7 @@
 
         protected Mock<ZendeskClientBase> ClientMock { get; set; }
 
-        protected IManager<TInterface> Manager { get; set; }
-
-        protected ManagerFixture<TModel> ManagerFixture { get; set; }
-
-        protected Mock<IRestResponse<TModel>> ResponseMock { get; set; }
+        internal Mock<IRequestHandler> RequestHandlerMock { get; set; }               
 
         #endregion
 
@@ -62,13 +62,8 @@
         [Fact]
         public virtual void GetMany_WithValidRequestAndExistingObject_ShouldReturnWithObject()
         {
-            // arrange
-            var pageResponse = this.GetPageResponse(2);
-
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<TModel>>(It.IsAny<IRestRequest>()))
-                .Returns(pageResponse)
-                .Callback<IRestRequest>(r => actualRequest = r);
+            var expectedPage = this.SetupPageResponse(x => actualRequest = x, 2);
 
             var expectedResourceParameter = string.Format(
                 "{0}/show_many.json?ids={1}",
@@ -76,7 +71,7 @@
                 string.Join(",", new[] { 1, 2 }));
 
             // act
-            var actualObjects = this.Manager.GetMany(new[] { 1, 2 }).Take(2).ToList();
+            var actualObjects = this.testable.ClassUnderTest.GetMany(new[] { 1, 2 }).Take(2).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -84,28 +79,26 @@
             actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
 
-            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Data.Collection);
+            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(expectedPage.Collection);
         }       
 
         [Fact]
         public void Get_WhenValidRequest_ExpectRequestMade()
         {
-            // arrange
-            var responseMock = new Mock<IRestResponse<TModel>>();
-            responseMock.SetupProperty(x => x.Data, this.ManagerFixture.Model)
-                .SetupProperty(x => x.StatusCode, HttpStatusCode.OK)
-                .SetupProperty(x => x.Request, new RestRequest { Method = Method.GET });
+            
 
+            // arrange
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<TModel>(It.IsAny<IRestRequest>()))
-                .Returns(responseMock.Object)
-                .Callback<IRestRequest>(r => actualRequest = r);
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()))
+                .Returns(model)
+                .Callback<IRestRequest>(r => actualRequest = r)
+                .Verifiable();
 
             // act
             var actualItem = this.Manager.Get(ExpectedId);
 
             // assert
-            this.ClientMock.Verify(x => x.Execute<TModel>(It.IsAny<IRestRequest>()), Times.Once);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()), Times.Once);
             actualRequest.Should().NotBeNull();
             actualRequest.Method.Should().Be(Method.GET);
             var expectedResource = string.Format(
@@ -113,12 +106,7 @@
                 typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize(),
                 ExpectedId);
             actualRequest.Resource.Should().Be(expectedResource);
-            actualItem.ShouldBeSameAs(this.ManagerFixture.Model);
-        }
-
-        public void SetFixture(ManagerFixture<TModel> data)
-        {
-            this.ManagerFixture = data;
+            actualItem.ShouldBeSameAs(model);
         }
 
         [Fact]
@@ -138,13 +126,14 @@
         {
             // arrange
             var model = new TModel { WasSubmitted = true, Id = 1 };
-            this.ClientMock.Setup(x => x.Execute(It.IsAny<IRestRequest>())).Verifiable();
+            this.RequestHandlerMock.Setup(x => x.MakeRequest(It.IsAny<IRestRequest>())).Verifiable();
 
             // act
             this.Manager.SubmitUpdatesFor(model);
 
             // assert
-            this.ClientMock.Verify(x => x.Execute<TModel>(It.IsAny<IRestRequest>()), Times.Never);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest(It.IsAny<IRestRequest>()), Times.Never);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()), Times.Never);
         }
 
         [Fact]
@@ -189,16 +178,14 @@
         public void SubmitUpdatesFor_WithValidRequestAndExistingObject_ShouldReturnSuccessful()
         {
             // arrange
-            var model = this.ManagerFixture.Fixture.Create<TModel>();
+            var model = this.Fixture.Create<TModel>();
             var modelAsTrackable = model as TrackableZendeskThingBase;
             modelAsTrackable.Id = 1;
             modelAsTrackable.WasSubmitted = true;
-            modelAsTrackable.ChangedPropertiesSet.Add("foo");
-
-            this.SetupOkResponse();
+            modelAsTrackable.ChangedPropertiesSet.Add("foo");            
 
             IRestRequest actualRequest = null;
-            this.SetupVerifiableClientExecuteGetActualRequest(x => actualRequest = x);
+            this.SetupVerifiableRequestHandlerExecuteGetActualRequest(x => actualRequest = x);
 
             const string JsonBodyInput = "{\"test\"=1}";
             const string ExpectedJsonBody = "application/json=" + JsonBodyInput;
@@ -208,9 +195,7 @@
             serializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
                 .Callback<TrackableZendeskThingBase>(x => actualSerializedObject = x)
                 .Returns(ExpectedJsonBody)
-                .Verifiable();
-
-            //this.ClientMock.Object.Container.RegisterInstance(SerializationScenario.Update.ToString(), serializerMock.Object);
+                .Verifiable();            
 
             var pluralizedModel = (typeof(TModel).Name + "s").ToCPlusPlusNamingStyle();
             var expectedResource = pluralizedModel + "/1.json";
@@ -247,10 +232,12 @@
         public void TryGet_WhenGetSucceeds_ExpectOutAndReturnTrue()
         {
             // arrange
+            var model = this.Fixture.Create<TModel>();
+
             var mockManager = this.GetMockManager();
             mockManager.Setup(x => x.Get(It.IsAny<int>()))
                 .Callback(() => Debug.Write("MOCKED Exists"))
-                .Returns(this.ManagerFixture.Model)
+                .Returns(model)
                 .Verifiable();
 
             // act
@@ -260,53 +247,49 @@
             // assert
             mockManager.Verify(x => x.Get(ExpectedId), Times.Once());
             actualResult.Should().BeTrue();
-            actualModel.Should().BeSameAs(this.ManagerFixture.Model);
+            actualModel.Should().BeSameAs(model);
         }
 
         #endregion
 
         #region Methods
 
-        internal IRestResponse<IPage<TModel>> GetPageResponse(int numberOfObjects)
+        internal void SetupPageResponse(Action<IRestRequest> callBackAction, IPage<TModel> page)
+        {
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<TModel>>(It.IsAny<IRestRequest>()))
+                .Returns(page)
+                .Callback(callBackAction)
+                .Verifiable();
+        }
+
+        internal IPage<TModel> SetupPageResponse(Action<IRestRequest> callBackAction, int numberOfItemsInPage)
         {
             var objects = new List<TModel>();
-            for (var i = 1; i <= numberOfObjects; i++)
+            for (var i = 1; i <= numberOfItemsInPage; i++)
             {
                 int temp = i;
                 var objectToAdd = new TModel { Id = temp };
                 objects.Add(objectToAdd);
             }
 
-            return
-                Mock.Of<IRestResponse<IPage<TModel>>>(
-                    pgRsp =>
-                    pgRsp.StatusCode == HttpStatusCode.OK
-                    && pgRsp.Data == Mock.Of<IPage<TModel>>(pg => pg.Collection == objects)
-                    && pgRsp.Request == new RestRequest(Method.GET));
+            var page = this.testable.Fixture.Create<Mock<IPage<TModel>>>().SetupProperty(pg => pg.Collection, objects).Object;
+
+            this.SetupPageResponse(callBackAction, page);
+
+            return page;
         }
 
-        protected Mock<TManager> GetMockManager(bool callBase = true)
+        protected TModel SetupSingleResponse(Action<IRestRequest> callBackAction)
         {
-            return new Mock<TManager>(this.ClientMock.Object) { CallBase = callBase };
+            var model = this.testable.Fixture.Freeze<TModel>();
+            this.SetupSingleResponse(callBackAction, model);
+            return model;
         }
 
-        protected void SetupOkResponse(Method method = Method.GET)
+        protected void SetupSingleResponse(Action<IRestRequest> callBackAction, TModel model)
         {
-            this.ResponseMock.SetupProperty(x => x.Data, this.ManagerFixture.Model)
-                .SetupProperty(x => x.StatusCode, HttpStatusCode.OK)
-                .SetupProperty(x => x.Request, Mock.Of<IRestRequest>(x => x.Method == method))
-                .SetupProperty(x => x.Data, this.ManagerFixture.Model);
-        }
-
-        protected void SetupVerifiableClientExecute()
-        {
-            this.SetupVerifiableClientExecuteGetActualRequest(x => { });
-        }
-
-        protected void SetupVerifiableClientExecuteGetActualRequest(Action<IRestRequest> callBackAction)
-        {
-            this.ClientMock.Setup(x => x.Execute<TModel>(It.IsAny<IRestRequest>()))
-                .Returns(this.ResponseMock.Object)
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()))
+                .Returns(model)
                 .Callback(callBackAction)
                 .Verifiable();
         }

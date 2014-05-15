@@ -43,7 +43,7 @@
 
         public Mock<TDependencyToMock> InjectMock<TDependencyToMock>() where TDependencyToMock : class
         {
-            var a = new Mock<TDependencyToMock>();                        
+            var a = new Mock<TDependencyToMock>();
             this.Fixture.Inject(a.Object);
             return a;
         }

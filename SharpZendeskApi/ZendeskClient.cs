@@ -37,6 +37,8 @@
             string passwordOrToken,
             ZendeskAuthenticationMethod authenticationMethod)
         {
+            this.RequestHandler = new RequestHandler(this.RestClient);
+
             if (authenticationMethod == ZendeskAuthenticationMethod.Token)
             {
                 // per http://developer.zendesk.com/documentation/rest_api/introduction.html
@@ -48,15 +50,15 @@
             var domainUri = new Uri(domain);
             var apiUri = new Uri(domainUri, "api/v2");
 
-            this.UserAgent = "SharpZendeskApi";
-            this.BaseUrl = apiUri.AbsoluteUri;
-            this.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);            
+            this.RestClient.UserAgent = "SharpZendeskApi";
+            this.RestClient.BaseUrl = apiUri.AbsoluteUri;
+            this.RestClient.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);
 
             var deserializer = new ZendeskThingJsonDeserializer();
 
-            this.ClearHandlers();
-            this.AddHandler("application/json", deserializer);
-            this.AddHandler("test/json", deserializer);
+            this.RestClient.ClearHandlers();
+            this.RestClient.AddHandler("application/json", deserializer);
+            this.RestClient.AddHandler("test/json", deserializer);
         }
 
         #endregion

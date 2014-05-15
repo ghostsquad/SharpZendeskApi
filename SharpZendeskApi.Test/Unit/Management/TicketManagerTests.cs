@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
     using FluentAssertions;
 
@@ -13,12 +14,13 @@
 
     using SharpZendeskApi.Management;
     using SharpZendeskApi.Models;
+    using SharpZendeskApi.Test.Common;
 
     using Xunit;
     using Xunit.Should;
 
     public class TicketManagerTests : ManagerTestBase<Ticket, ITicket, TicketManager>
-    {
+    {        
         #region Public Methods and Operators
 
         [Fact]
@@ -27,8 +29,8 @@
             // arrange
             var pageResponse = this.GetPageResponse(2);
 
-            IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<Ticket>>(It.IsAny<IRestRequest>()))
+            IRestRequest actualRequest = null;            
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<Ticket>>(It.IsAny<IRestRequest>()))
                 .Returns(pageResponse)
                 .Callback<IRestRequest>(r => actualRequest = r);
 
@@ -44,7 +46,7 @@
             actualRequest.Resource.Should().Be(ExpectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
 
-            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Data.Collection);
+            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
         }
 
         [Fact]
@@ -54,7 +56,7 @@
             var pageResponse = this.GetPageResponse(2);
 
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<Ticket>>(It.IsAny<IRestRequest>()))
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<Ticket>>(It.IsAny<IRestRequest>()))
                 .Returns(pageResponse)
                 .Callback<IRestRequest>(r => actualRequest = r);
 
@@ -72,18 +74,17 @@
             actualRequest.Resource.Should().Be(ExpectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
 
-            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Data.Collection);
+            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
         }
 
         [Fact]
         public override void SubmitNew_UsingParameterizedConstructor_ExpectSuccess()
         {
             // arrange
-            var ticket = new Ticket(1, "test");
-            this.SetupOkResponse();
+            var ticket = new Ticket(1, "test");            
 
             IRestRequest actualRequest = null;
-            this.SetupVerifiableClientExecuteGetActualRequest(x => actualRequest = x);
+            this.SetupVerifiableRequestHandlerExecuteGetActualRequest(x => actualRequest = x);
 
             const string JsonBodyInput = "{\"test\"=1}";
             const string ExpectedJsonBody = "application/json=" + JsonBodyInput;

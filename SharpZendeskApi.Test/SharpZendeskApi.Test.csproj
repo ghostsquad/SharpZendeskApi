@@ -131,6 +131,7 @@
     <Compile Include="End2End\TicketTests.cs" />
     <Compile Include="Fakes\ExcludeAttributeCustomization.cs" />
     <Compile Include="Fakes\FakeZendeskThing.cs" />
+    <Compile Include="Fakes\Foo.cs" />
     <Compile Include="Fakes\IncludeAttributeCustomization.cs" />
     <Compile Include="Fakes\NullCustomization.cs" />
     <Compile Include="Fakes\ExcludeIfEndsIn1Customization.cs" />
@@ -139,7 +140,6 @@
     <Compile Include="Fakes\UnderScorePrependerCustomization.cs" />
     <Compile Include="Integration\AuthenticationTests.cs" />
     <Compile Include="Unit\CreationSerializerTests.cs" />
-    <Compile Include="Unit\Management\ManagerFixture.cs" />
     <Compile Include="Unit\Management\ManagerTestBase.cs" />
     <Compile Include="Unit\Management\TicketManagerTests.cs" />
     <Compile Include="Unit\Management\UserManagerTests.cs" />

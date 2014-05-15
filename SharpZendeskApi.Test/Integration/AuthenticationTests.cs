@@ -1,6 +1,9 @@
 ﻿namespace SharpZendeskApi.Test.Integration
 {
+    using System;
     using System.Net;
+
+    using Cavity;
 
     using FluentAssertions;
 
@@ -18,7 +21,6 @@
         {
             var request = new RestRequest { Method = Method.GET, Resource = "tickets/{id}.json" };
             request.AddUrlSegment("id", "1");
-            request.AddHeader("Keep-Alive", "max=1, timeout=1");
 
             return request;
         }
@@ -31,12 +33,9 @@
         {           
             // arrange
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Basic, false);
-            
-            // act
-            var actualResponse = client.Execute(this.GetNewRequest());                        
 
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized, "because the password given is incorrect");            
+            // act
+            client.RequestHandler.Invoking(x => x.MakeRequest(this.GetNewRequest())).ShouldThrow<UnauthorizedAccessException>();
         }
 
         /// <summary>
@@ -49,10 +48,7 @@
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Token, false);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());                       
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized, "because the token givecn is incorrect");            
+            client.RequestHandler.Invoking(x => x.MakeRequest(this.GetNewRequest())).ShouldThrow<UnauthorizedAccessException>();
         }
 
         /// <summary>
@@ -65,10 +61,7 @@
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Basic);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());            
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the password is correct");           
+            client.RequestHandler.MakeRequest(this.GetNewRequest());
         }
 
         /// <summary>
@@ -81,10 +74,7 @@
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Token);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());                        
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the token is correct");            
+            client.RequestHandler.MakeRequest(this.GetNewRequest());
         }
 
         #endregion

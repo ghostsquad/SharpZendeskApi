@@ -1,11 +1,8 @@
 ﻿namespace SharpZendeskApi.Models
 {
-    using System;
     using System.Collections.Generic;
 
-    using SharpZendeskApi.Models.Attributes;
-
-    public interface ITrackable
+    public interface ITrackable : IZendeskThing
     {
         int? Id { get; }
 

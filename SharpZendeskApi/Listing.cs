@@ -199,7 +199,7 @@
                     {
                         if (param.Name == "page")
                         {
-                            param.Value = this.listing.CurrentPage = this.currentPageNumber;
+                            param.Value = this.currentPageNumber;
                         }
 
                         nextRequest.AddParameter(param);
@@ -207,9 +207,10 @@
                 }
                 else
                 {
-                    nextRequest.AddParameter("page", this.listing.CurrentPage = this.currentPageNumber);
+                    nextRequest.AddParameter("page", this.currentPageNumber);
                 }
 
+                this.listing.CurrentPage = this.currentPageNumber;
                 this.lastRequest = nextRequest;
 
                 var result = this.listing.Client.RequestHandler.MakeRequest<IPage<TModel>>(this.lastRequest);

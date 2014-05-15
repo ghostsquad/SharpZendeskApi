@@ -3,7 +3,7 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
 
-    public interface ITicketField : IZendeskThing, ITrackable
+    public interface ITicketField : ITrackable
     {
         /// <summary>
         ///     Gets or sets a value indicating whether active.
