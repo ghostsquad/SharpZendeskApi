@@ -98,7 +98,7 @@
             this.testable.ClassUnderTest.AtEndOfPage.Should().BeTrue("because we are on ticket 2 of 2.");
         }
 
-        [Fact(Timeout = 200)]
+        [Fact]
         public void MoveNext_GivenMultipageMultiItem_WhenAtVeryEnd_ExpectFalse()
         {
             this.AddPageOfItems(2, Page2Uri);

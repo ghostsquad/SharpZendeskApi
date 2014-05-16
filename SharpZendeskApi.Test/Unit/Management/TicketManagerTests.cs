@@ -2,19 +2,17 @@
 {
     using System;
     using System.Linq;
-    using System.Runtime.InteropServices;
 
     using FluentAssertions;
 
-    using Microsoft.Practices.Unity;
-
     using Moq;
+
+    using Ploeh.AutoFixture;
 
     using RestSharp;
 
     using SharpZendeskApi.Management;
     using SharpZendeskApi.Models;
-    using SharpZendeskApi.Test.Common;
 
     using Xunit;
     using Xunit.Should;
@@ -32,10 +30,7 @@
             var expectedResourceParameter = "views/" + ExpectedId + "/tickets.json";
 
             // act
-            var ticketManager = this.testable.ClassUnderTest.As<TicketManager>();
-            ticketManager.ShouldNotBeNull();
-
-            ticketManager.FromView(1).ToList();
+            this.testable.ClassUnderTest.FromView(1).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -46,56 +41,46 @@
         [Fact]
         public void FromViewOverload_AssertCallsFromViewWithViewId()
         {
+            var managerMock = this.testable.InjectMock<TicketManager>(this.ClientMock.Object);
+            managerMock.CallBase = true;
 
+            int? actualId = null;
+            managerMock.Setup(x => x.FromView(It.IsAny<int>()))
+                .Callback<int>(x => actualId = x);
 
-            // arrange
-            var pageResponse = this.GetPageResponse(2);
-
-            IRestRequest actualRequest = null;
-            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<Ticket>>(It.IsAny<IRestRequest>()))
-                .Returns(pageResponse)
-                .Callback<IRestRequest>(r => actualRequest = r);
-
-            var viewObject = Mock.Of<View>(x => x.Id == 1);
-
-            // http://developer.zendesk.com/documentation/rest_api/views.html#getting-tickets-from-a-view
-            const string ExpectedResourceParameter = "views/1/tickets.json";
+            var viewObject = Mock.Of<View>(x => x.Id == TicketManagerTests.ExpectedId);
 
             // act
-            var actualTickets = this.Manager.As<TicketManager>().FromView(viewObject).Take(2).ToList();
+            testable.ClassUnderTest.FromView(viewObject);
 
             // assert
-            actualRequest.Should().NotBeNull();
-
-            actualRequest.Resource.Should().Be(ExpectedResourceParameter);
-            actualRequest.Method.Should().Be(Method.GET);
-
-            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
+            actualId.ShouldNotBeNull();
+            actualId.Should().Be(TicketManagerTests.ExpectedId);
         }
 
         [Fact]
-        public override void SubmitNew_UsingParameterizedConstructor_ExpectSuccess()
+        public override void SubmitNew_AssertRequestConstruction()
         {
             // arrange
-            var ticket = new Ticket(1, "test");            
+            var ticket = new Ticket(1, "test");
 
             IRestRequest actualRequest = null;
-            this.SetupVerifiableRequestHandlerExecuteGetActualRequest(x => actualRequest = x);
+            this.SetupSingleResponse(x => actualRequest = x, ticket);
 
             const string JsonBodyInput = "{\"test\"=1}";
             const string ExpectedJsonBody = "application/json=" + JsonBodyInput;
 
             TrackableZendeskThingBase actualSerializedObject = null;
-            var serializerMock = new Mock<IZendeskSerializer>();
+            var serializerMock = testable.InjectMock<IZendeskSerializer>();
             serializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
                     .Callback<TrackableZendeskThingBase>(x => actualSerializedObject = x)
                     .Returns(ExpectedJsonBody)
-                    .Verifiable();            
+                    .Verifiable();
 
             const string ExpectedResource = "tickets.json";
 
             // act
-            this.Manager.SubmitNew(ticket);
+            this.testable.ClassUnderTest.SubmitNew(ticket);
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -109,7 +94,7 @@
         public void FromView_GivenNull_ExpectArgumentNullException()
         {
             // act & assert
-            this.Manager.As<TicketManager>().Invoking(x => x.FromView(null)).ShouldThrow<ArgumentNullException>();
+            this.testable.ClassUnderTest.Invoking(x => x.FromView(null)).ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
@@ -119,8 +104,7 @@
             var view = new View();
 
             // act & assert
-            this.Manager.As<TicketManager>()
-                .Invoking(x => x.FromView(view))
+            this.testable.ClassUnderTest.Invoking(x => x.FromView(view))
                 .ShouldThrow<ArgumentException>()
                 .WithMessage("View Id is null!");
         }

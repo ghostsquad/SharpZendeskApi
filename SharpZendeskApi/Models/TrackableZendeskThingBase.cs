@@ -31,10 +31,10 @@
         }
 
         [Attributes.ReadOnly]
-        public int? Id { get; set; }
+        public virtual int? Id { get; set; }
 
         [JsonIgnore]
-        public bool WasSubmitted { get; internal set; }
+        public virtual bool WasSubmitted { get; internal set; }
 
         #endregion
 

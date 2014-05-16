@@ -14,7 +14,7 @@ namespace SharpZendeskApi.Test.Unit.Management
     public class UserManagerTests : ManagerTestBase<User, IUser, UserManager>
     {
         [Fact(Skip = "not implemented")]
-        public override void SubmitNew_UsingParameterizedConstructor_ExpectSuccess()
+        public override void SubmitNew_AssertRequestConstruction()
         {
             throw new NotImplementedException();
         }

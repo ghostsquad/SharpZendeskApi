@@ -26,38 +26,35 @@ namespace SharpZendeskApi.Test.Unit.Management
         }
 
         [Fact(Skip = "not implemented")]
-        public override void SubmitNew_UsingParameterizedConstructor_ExpectSuccess()
+        public override void SubmitNew_AssertRequestConstruction()
         {
             throw new NotImplementedException();
         }
 
         [Fact]
-        public void CanGetAvailable()
+        public void GetAvailableViews_AssertRequestConstruction()
         {            
             // arrange
-            var pageResponse = this.GetPageResponse(2);
-
             IRestRequest actualRequest = null;
+            var page = this.SetupPageResponse(x => actualRequest = x, 2);
+
             this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<View>>(It.IsAny<IRestRequest>()))
-                .Returns(pageResponse)
+                .Returns(page)
                 .Callback<IRestRequest>(r => actualRequest = r);
 
             var expectedResourceParameter = string.Format(
                 "{0}.json",
                 typeof(View).GetTypeNameAsCPlusPlusStyle().Pluralize());
 
-            var manager = this.Manager as ViewManager;
+            var manager = this.testable.ClassUnderTest;
 
             // act
-            var actualObjects = manager.GetAvailableViews(true).Take(2).ToList();
+            manager.GetAvailableViews(true).Take(2).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
-
             actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
-
-            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
         }
     }
 }

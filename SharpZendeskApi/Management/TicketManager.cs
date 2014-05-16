@@ -7,7 +7,7 @@
 
     using SharpZendeskApi.Models;
 
-    public class TicketManager : ManagerBase<Ticket, ITicket>
+    public sealed class TicketManager : ManagerBase<Ticket, ITicket>, ITicketManager
     {
         private const string SingleTicketEndpoint = "tickets/{0}.json";
 
@@ -28,7 +28,7 @@
 
             var request = new RestRequest(url, Method.GET) { RootElement = this.PluralizedModelName };
 
-            return new Listing<Ticket, ITicket>(this.Client, request);
+            return this.Client.GetListing<Ticket, ITicket>(request);
         }
 
         public IListing<ITicket> FromView(IView view)

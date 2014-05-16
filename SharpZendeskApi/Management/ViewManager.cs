@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpZendeskApi.Management
+﻿namespace SharpZendeskApi.Management
 {
+    using System;
+    using System.Collections.Generic;
+
     using RestSharp;
 
     using SharpZendeskApi.Models;
 
-    public class ViewManager : ManagerBase<View, IView>
+    public sealed class ViewManager : ManagerBase<View, IView>, IViewManager
     {
         private const string SingleEndpoint = "views/{0}.json";
 

@@ -61,6 +61,10 @@
     <Compile Include="ContractResolution\IncludeOnlyChangedPropertiesCustomization.cs" />
     <Compile Include="CreationSerializer.cs" />
     <Compile Include="IRequestHandler.cs" />
+    <Compile Include="Management\IAttachmentManager.cs" />
+    <Compile Include="Management\ITicketManager.cs" />
+    <Compile Include="Management\IUserManager.cs" />
+    <Compile Include="Management\IViewManager.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="ZendeskClientBase.cs" />
     <Compile Include="IZendeskSerializer.cs" />

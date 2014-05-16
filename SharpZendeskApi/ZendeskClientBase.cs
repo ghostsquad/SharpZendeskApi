@@ -4,6 +4,8 @@
 
     using RestSharp;
 
+    using SharpZendeskApi.Models;
+
     public abstract class ZendeskClientBase
     {
         #region Constructors and Destructors
@@ -44,6 +46,13 @@
                         throw new ArgumentException("Unknown Scenario: " + scenario);
                     }
             }
+        }
+
+        internal virtual IListing<TInterface> GetListing<TModel, TInterface>(IRestRequest request)
+            where TInterface : class, ITrackable
+            where TModel : TrackableZendeskThingBase, TInterface
+        {
+            return new Listing<TModel, TInterface>(this, request);
         }
 
         #endregion

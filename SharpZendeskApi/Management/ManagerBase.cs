@@ -11,7 +11,8 @@
     using SharpZendeskApi.Models;
 
     public abstract class ManagerBase<TModel, TInterface> : IManager<TInterface>
-        where TInterface : class, IZendeskThing, ITrackable where TModel : TrackableZendeskThingBase, TInterface
+        where TInterface : class, IZendeskThing, ITrackable
+        where TModel : TrackableZendeskThingBase, TInterface
     {
         #region Constructors and Destructors               
 
@@ -81,7 +82,7 @@
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize()
                               };
 
-            return new Listing<TModel, TInterface>(this.Client, request);
+            return this.Client.GetListing<TModel, TInterface>(request);
         }
 
         protected TInterface SubmitNew(string url, TInterface obj)
@@ -101,7 +102,7 @@
 
             var request = new RestRequest(url, Method.POST)
                               {
-                                  RequestFormat = DataFormat.Json, 
+                                  RequestFormat = DataFormat.Json,
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 

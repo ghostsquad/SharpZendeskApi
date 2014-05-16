@@ -140,7 +140,7 @@
             this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(model)).ShouldThrow<MandatoryPropertyNullValueException>();
         }
 
-        public abstract void SubmitNew_UsingParameterizedConstructor_ExpectSuccess();
+        public abstract void SubmitNew_AssertRequestConstruction();
 
         [Fact]
         public void SubmitNew_WithAlreadySubmittedObject_ExpectArgumentException()
@@ -172,7 +172,7 @@
         public void SubmitUpdatesFor_AssertRequestCreation()
         {
             // arrange
-            var modelMock = new Mock<TModel>();
+            var modelMock = new Mock<TrackableZendeskThingBase>().As<TModel>();
             modelMock.SetupProperty(x => x.Id, 1)
                 .SetupProperty(x => x.WasSubmitted, true)
                 .SetupProperty(x => x.ChangedPropertiesSet, new HashSet<string> { "foo" });

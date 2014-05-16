@@ -2,13 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     using SharpZendeskApi.Models;
 
-    public class AttachmentManager : ManagerBase<Attachment, IAttachment>
+    public sealed class AttachmentManager : ManagerBase<Attachment, IAttachment>, IAttachmentManager
     {
         private const string SingleEndpoint = "attachments/{0}.json";
 
