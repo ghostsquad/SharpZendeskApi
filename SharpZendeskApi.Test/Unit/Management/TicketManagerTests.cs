@@ -24,34 +24,30 @@
         #region Public Methods and Operators
 
         [Fact]
-        public void CanGetFromViewWhenGivenId()
+        public void FromView_AssertRequest()
         {
-            // arrange
-            var pageResponse = this.GetPageResponse(2);
+            IRestRequest actualRequest = null;
+            this.SetupPageResponse(x => actualRequest = x, 1);
 
-            IRestRequest actualRequest = null;            
-            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<Ticket>>(It.IsAny<IRestRequest>()))
-                .Returns(pageResponse)
-                .Callback<IRestRequest>(r => actualRequest = r);
-
-            // http://developer.zendesk.com/documentation/rest_api/views.html#getting-tickets-from-a-view
-            const string ExpectedResourceParameter = "views/1/tickets.json";
+            var expectedResourceParameter = "views/" + ExpectedId + "/tickets.json";
 
             // act
-            var actualTickets = this.Manager.As<TicketManager>().FromView(1).Take(2).ToList();
+            var ticketManager = this.testable.ClassUnderTest.As<TicketManager>();
+            ticketManager.ShouldNotBeNull();
+
+            ticketManager.FromView(1).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
-
-            actualRequest.Resource.Should().Be(ExpectedResourceParameter);
+            actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
-
-            actualTickets.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Collection);
         }
 
         [Fact]
-        public void CanGetFromViewWhenGivenViewObject()
+        public void FromViewOverload_AssertCallsFromViewWithViewId()
         {
+
+
             // arrange
             var pageResponse = this.GetPageResponse(2);
 

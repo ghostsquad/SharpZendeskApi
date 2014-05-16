@@ -43,7 +43,19 @@
 
         public Mock<TDependencyToMock> InjectMock<TDependencyToMock>() where TDependencyToMock : class
         {
-            var a = new Mock<TDependencyToMock>();
+            return this.InjectMock<TDependencyToMock>(MockBehavior.Default);
+        }
+
+        public Mock<TDependencyToMock> InjectMock<TDependencyToMock>(params object[] args)
+            where TDependencyToMock : class
+        {
+            return this.InjectMock<TDependencyToMock>(MockBehavior.Default, args);
+        }
+
+        public Mock<TDependencyToMock> InjectMock<TDependencyToMock>(MockBehavior behavior, params object[] args)
+            where TDependencyToMock : class
+        {
+            var a = new Mock<TDependencyToMock>(behavior, args);
             this.Fixture.Inject(a.Object);
             return a;
         }
