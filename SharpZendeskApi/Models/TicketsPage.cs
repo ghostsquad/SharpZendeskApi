@@ -5,7 +5,7 @@
 
     internal class TicketsPage : IPage<Ticket>
     {
-        public List<Ticket> Collection
+        public IList<Ticket> Collection
         {
             get
             {
@@ -20,7 +20,7 @@
             }
         }
 
-        public List<Ticket> Tickets { get; set; } 
+        public IList<Ticket> Tickets { get; set; } 
 
         public string NextPage { get; set; }
 

@@ -2,14 +2,17 @@
 {
     using System;
 
-    using RestSharp;
+    using Microsoft.Practices.Unity;
 
-    using TinyIoC;
+    using RestSharp;
+    using RestSharp.Deserializers;
+
+    using SharpZendeskApi.Models;
 
     /// <summary>
     /// The sharp zendesk api client.
     /// </summary>
-    public sealed class ZendeskClient : RestClient, IZendeskClient
+    public sealed class ZendeskClient : ZendeskClientBase
     {        
         #region Constructors and Destructors
 
@@ -33,7 +36,9 @@
             string emailAddress,
             string passwordOrToken,
             ZendeskAuthenticationMethod authenticationMethod)
-        {            
+        {
+            this.RequestHandler = new RequestHandler(this.RestClient);
+
             if (authenticationMethod == ZendeskAuthenticationMethod.Token)
             {
                 // per http://developer.zendesk.com/documentation/rest_api/introduction.html
@@ -45,22 +50,16 @@
             var domainUri = new Uri(domain);
             var apiUri = new Uri(domainUri, "api/v2");
 
-            this.UserAgent = "SharpZendeskApi";
-            this.BaseUrl = apiUri.AbsoluteUri;
-            this.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);
+            this.RestClient.UserAgent = "SharpZendeskApi";
+            this.RestClient.BaseUrl = apiUri.AbsoluteUri;
+            this.RestClient.Authenticator = new HttpBasicAuthenticator(emailAddress, passwordOrToken);
 
-            this.Container = new TinyIoCContainer();
+            var deserializer = new ZendeskThingJsonDeserializer();
 
-            // register default serializers
-            this.Container.Register<IZendeskSerializer, CreationSerializer>(SerializationScenario.Create.ToString());
-            this.Container.Register<IZendeskSerializer, UpdatingSerializer>(SerializationScenario.Update.ToString());
+            this.RestClient.ClearHandlers();
+            this.RestClient.AddHandler("application/json", deserializer);
+            this.RestClient.AddHandler("test/json", deserializer);
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public TinyIoCContainer Container { get; set; }
 
         #endregion
     }

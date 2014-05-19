@@ -55,6 +55,15 @@
       <HintPath>..\packages\FluentAssertions.2.2.0.0\lib\net45\FluentAssertions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=4.2.1402.2112, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Moq.4.2.1402.2112\lib\net40\Moq.dll</HintPath>
@@ -88,9 +97,6 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="TinyIoC">
-      <HintPath>..\externals\TinyIoC.dll</HintPath>
-    </Reference>
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
     </Reference>
@@ -118,11 +124,16 @@
     <Compile Include="Common\JsonObjects\PageJson.cs" />
     <Compile Include="Common\JsonObjects\RestrictionJson.cs" />
     <Compile Include="Common\JsonObjects\TicketFieldJson.cs" />
+    <Compile Include="Common\JsonObjects\ViewColumnJson.cs" />
     <Compile Include="Common\JsonObjects\ViewJson.cs" />
+    <Compile Include="Common\JsonObjects\ViewOutputJson.cs" />
     <Compile Include="Common\RespectOnlyReadOnlyPropertiesSpecimenCustomization.cs" />
+    <Compile Include="Common\Testable.cs" />
     <Compile Include="End2End\TicketTests.cs" />
+    <Compile Include="End2End\ViewTests.cs" />
     <Compile Include="Fakes\ExcludeAttributeCustomization.cs" />
     <Compile Include="Fakes\FakeZendeskThing.cs" />
+    <Compile Include="Fakes\Foo.cs" />
     <Compile Include="Fakes\IncludeAttributeCustomization.cs" />
     <Compile Include="Fakes\NullCustomization.cs" />
     <Compile Include="Fakes\ExcludeIfEndsIn1Customization.cs" />
@@ -131,9 +142,13 @@
     <Compile Include="Fakes\UnderScorePrependerCustomization.cs" />
     <Compile Include="Integration\AuthenticationTests.cs" />
     <Compile Include="Unit\CreationSerializerTests.cs" />
-    <Compile Include="Unit\Management\ManagerFixture.cs" />
     <Compile Include="Unit\Management\ManagerTestBase.cs" />
     <Compile Include="Unit\Management\TicketManagerTests.cs" />
+    <Compile Include="Unit\Management\UserManagerTests.cs" />
+    <Compile Include="Unit\Management\ViewManagerTests.cs" />
+    <Compile Include="Unit\Models\UserTests.cs" />
+    <Compile Include="Unit\Models\ViewTests.cs" />
+    <Compile Include="Unit\RequestHandlerTests.cs" />
     <Compile Include="Unit\ResponseExtensionTests.cs" />
     <Compile Include="Unit\Models\ModelFixture.cs" />
     <Compile Include="Unit\Models\ModelTestBase.cs" />

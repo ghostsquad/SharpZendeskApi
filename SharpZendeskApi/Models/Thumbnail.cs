@@ -10,10 +10,12 @@
 // thumbnails   array   yes      no        An array of Photo objects. Note that thumbnails do not have thumbnails.
 namespace SharpZendeskApi.Models
 {
+    using SharpZendeskApi.Models.Attributes;
+
     /// <summary>
     ///     The thumbnail.
     /// </summary>
-    public class Thumbnail : TrackableZendeskThingBase
+    public class Thumbnail : TrackableZendeskThingBase, IThumbnail
     {
         #region Public Properties
 

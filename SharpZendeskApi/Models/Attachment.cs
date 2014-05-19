@@ -18,7 +18,7 @@ namespace SharpZendeskApi.Models
     /// <summary>
     /// The attachment.
     /// </summary>
-    public class Attachment : TrackableZendeskThingBase
+    public class Attachment : TrackableZendeskThingBase, IAttachment
     {
         #region Public Properties
 
@@ -50,7 +50,7 @@ namespace SharpZendeskApi.Models
         /// Gets or sets the thumbnails.
         /// </summary>
         [ReadOnly]
-        public List<Thumbnail> Thumbnails { get; set; }
+        public IList<IThumbnail> Thumbnails { get; set; }
 
         #endregion
     }

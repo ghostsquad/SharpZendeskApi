@@ -13,6 +13,8 @@
 
         int? CurrentPage { get; }
 
+        int Count { get; }
+
         int? NextPage { get; }
 
         int? PreviousPage { get; }

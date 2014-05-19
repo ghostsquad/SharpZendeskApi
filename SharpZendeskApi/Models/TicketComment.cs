@@ -18,14 +18,14 @@ namespace SharpZendeskApi.Models
     /// <summary>
     /// The ticket comment.
     /// </summary>
-    public class TicketComment : TrackableZendeskThingBase
+    public class TicketComment : TrackableZendeskThingBase, ITicketComment
     {
         #region Public Properties      
 
         /// <summary>
         /// Gets or sets the attachments.
         /// </summary>
-        public List<Attachment> Attachments { get; set; }
+        public IList<IAttachment> Attachments { get; set; }
 
         /// <summary>
         /// Gets or sets the author id.

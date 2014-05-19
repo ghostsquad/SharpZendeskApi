@@ -30,7 +30,7 @@
             }
         }
 
-        public static void ThrowIfNotSubmitted(this TrackableZendeskThingBase zendeskThing)
+        public static void ThrowIfNotSubmitted(this ITrackable zendeskThing)
         {
             if (!zendeskThing.WasSubmitted)
             {
@@ -38,7 +38,7 @@
             }
         }
 
-        public static void ThrowIfSubmitted(this TrackableZendeskThingBase zendeskThing)
+        public static void ThrowIfSubmitted(this ITrackable zendeskThing)
         {
             if (zendeskThing.WasSubmitted)
             {

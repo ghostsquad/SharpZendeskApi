@@ -30,7 +30,7 @@ namespace SharpZendeskApi.Models
     /// <summary>
     ///     The ticket field.
     /// </summary>
-    public class TicketField : TrackableZendeskThingBase
+    public class TicketField : TrackableZendeskThingBase, ITicketField
     {
         #region Public Properties
 

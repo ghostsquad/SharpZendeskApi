@@ -1,6 +1,9 @@
 ﻿namespace SharpZendeskApi.Test.Integration
 {
+    using System;
     using System.Net;
+
+    using Cavity;
 
     using FluentAssertions;
 
@@ -18,7 +21,6 @@
         {
             var request = new RestRequest { Method = Method.GET, Resource = "tickets/{id}.json" };
             request.AddUrlSegment("id", "1");
-            request.AddHeader("Keep-Alive", "max=1, timeout=1");
 
             return request;
         }
@@ -26,65 +28,53 @@
         /// <summary>
         /// The given incorrect password based credentials to known zendesk portal when ticket requested expect exception.
         /// </summary>
-        [Fact]        
+        [Fact(Timeout = 10000)]        
         public void GivenIncorrectPasswordBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectUnauthorized()
         {           
             // arrange
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Basic, false);
-            
-            // act
-            var actualResponse = client.Execute(this.GetNewRequest());                        
 
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized, "because the password given is incorrect");            
+            // act
+            client.RequestHandler.Invoking(x => x.MakeRequest(this.GetNewRequest())).ShouldThrow<UnauthorizedAccessException>();
         }
 
         /// <summary>
         /// The given incorrect token based credentials to known zendesk portal when ticket requested expect exception.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenIncorrectTokenBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectUnauthorized()
         {
             // arrange
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Token, false);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());                       
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized, "because the token givecn is incorrect");            
+            client.RequestHandler.Invoking(x => x.MakeRequest(this.GetNewRequest())).ShouldThrow<UnauthorizedAccessException>();
         }
 
         /// <summary>
         /// The given password based credentials to known zendesk portal when ticket requested expect ok response.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenPasswordBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectOkResponse()
         {
             // arrange
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Basic);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());            
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the password is correct");           
+            client.RequestHandler.MakeRequest(this.GetNewRequest());
         }
 
         /// <summary>
         /// The given token based credentials to known zendesk portal when ticket requested expect ok response.
         /// </summary>
-        [Fact]
+        [Fact(Timeout = 10000)]
         public void GivenTokenBasedCredentialsToKnownZendeskPortalWhenTicketRequestedExpectOkResponse()
         {
             // arrange
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Token);
 
             // act
-            var actualResponse = client.Execute(this.GetNewRequest());                        
-
-            // assert
-            actualResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the token is correct");            
+            client.RequestHandler.MakeRequest(this.GetNewRequest());
         }
 
         #endregion

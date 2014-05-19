@@ -79,6 +79,8 @@ namespace SharpZendeskApi.Models
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.Practices.Unity;
+
     using SharpZendeskApi.Models.Attributes;
 
     /// <summary>
@@ -131,6 +133,7 @@ namespace SharpZendeskApi.Models
             this.Description = description;
         }
 
+        [InjectionConstructor]
         public Ticket()
         {
         }
@@ -240,7 +243,7 @@ namespace SharpZendeskApi.Models
         }
 
         [ReadOnly]
-        public List<int> FollowupIds { get; set; }
+        public IList<int> FollowupIds { get; set; }
 
         public int? ForumTopicId
         {
@@ -323,10 +326,10 @@ namespace SharpZendeskApi.Models
         }
 
         [ReadOnly]
-        public SatisfactionRating SatisfactionRating { get; set; }
+        public ISatisfactionRating SatisfactionRating { get; set; }
 
         [ReadOnly]
-        public List<int> SharingAgreementIds { get; set; }
+        public IList<int> SharingAgreementIds { get; set; }
 
         /// <summary>
         ///     Gets or sets the status.

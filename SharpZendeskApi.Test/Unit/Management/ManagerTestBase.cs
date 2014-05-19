@@ -8,25 +8,27 @@
 
     using FluentAssertions;
 
+    using Microsoft.Practices.Unity;
+
     using Moq;
 
     using Ploeh.AutoFixture;
+    using Ploeh.AutoFixture.AutoMoq;
 
     using RestSharp;
 
     using SharpZendeskApi.Exceptions;
     using SharpZendeskApi.Management;
     using SharpZendeskApi.Models;
-
-    using TinyIoC;
+    using SharpZendeskApi.Test.Common;
 
     using Xunit;
     using Xunit.Should;
 
-    public abstract class ManagerTestBase<TModel, TInterface, TManager> : IUseFixture<ManagerFixture<TModel>>
+    public abstract class ManagerTestBase<TModel, TInterface, TManager>
         where TModel : TrackableZendeskThingBase, TInterface, new()
         where TInterface : class, IZendeskThing, ITrackable
-        where TManager : class, IManager<TInterface>
+        where TManager : ManagerBase<TModel, TInterface>
     {
         #region Constants
 
@@ -34,26 +36,24 @@
 
         #endregion
 
+        protected Testable<TManager> testable = new Testable<TManager>();
+
         #region Constructors and Destructors
 
         protected ManagerTestBase()
         {
-            this.ClientMock = new Mock<IZendeskClient>().SetupProperty(x => x.Container, new TinyIoCContainer());
-            this.ResponseMock = new Mock<IRestResponse<TModel>>();
-            this.Manager = (TManager)Activator.CreateInstance(typeof(TManager), this.ClientMock.Object);
+            this.RequestHandlerMock = new Mock<IRequestHandler>();
+            this.ClientMock = this.testable.InjectMock<ZendeskClientBase>()
+                .SetupProperty(x => x.RequestHandler, this.RequestHandlerMock.Object);
         }
 
         #endregion
 
         #region Properties
 
-        protected Mock<IZendeskClient> ClientMock { get; set; }
+        protected Mock<ZendeskClientBase> ClientMock { get; set; }
 
-        protected IManager<TInterface> Manager { get; set; }
-
-        protected ManagerFixture<TModel> ManagerFixture { get; set; }
-
-        protected Mock<IRestResponse<TModel>> ResponseMock { get; set; }
+        internal Mock<IRequestHandler> RequestHandlerMock { get; set; }               
 
         #endregion
 
@@ -62,13 +62,9 @@
         [Fact]
         public virtual void GetMany_WithValidRequestAndExistingObject_ShouldReturnWithObject()
         {
-            // arrange
-            var pageResponse = this.GetPageResponse(2);
-
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<IPage<TModel>>(It.IsAny<IRestRequest>()))
-                .Returns(pageResponse)
-                .Callback<IRestRequest>(r => actualRequest = r);
+            var expectedListing = this.SetupListingResponse(x => actualRequest = x, 2);
+            var expectedCollection = expectedListing.ToList();
 
             var expectedResourceParameter = string.Format(
                 "{0}/show_many.json?ids={1}",
@@ -76,7 +72,7 @@
                 string.Join(",", new[] { 1, 2 }));
 
             // act
-            var actualObjects = this.Manager.GetMany(new[] { 1, 2 }).Take(2).ToList();
+            var actualObjects = this.testable.ClassUnderTest.GetMany(new[] { 1, 2 }).Take(2).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -84,28 +80,20 @@
             actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
 
-            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(pageResponse.Data.Collection);
+            actualObjects.Should().NotBeEmpty().And.HaveCount(2).And.ContainInOrder(expectedCollection);
         }       
 
         [Fact]
-        public void Get_WhenValidRequest_ExpectRequestMade()
+        public void Get_AssertRequest()
         {
-            // arrange
-            var responseMock = new Mock<IRestResponse<TModel>>();
-            responseMock.SetupProperty(x => x.Data, this.ManagerFixture.Model)
-                .SetupProperty(x => x.StatusCode, HttpStatusCode.OK)
-                .SetupProperty(x => x.Request, new RestRequest { Method = Method.GET });
-
             IRestRequest actualRequest = null;
-            this.ClientMock.Setup(x => x.Execute<TModel>(It.IsAny<IRestRequest>()))
-                .Returns(responseMock.Object)
-                .Callback<IRestRequest>(r => actualRequest = r);
+            var model = this.SetupSingleResponse(x => actualRequest = x);
 
             // act
-            var actualItem = this.Manager.Get(ExpectedId);
+            var actualItem = this.testable.ClassUnderTest.Get(ExpectedId);
 
             // assert
-            this.ClientMock.Verify(x => x.Execute<TModel>(It.IsAny<IRestRequest>()), Times.Once);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()), Times.Once);
             actualRequest.Should().NotBeNull();
             actualRequest.Method.Should().Be(Method.GET);
             var expectedResource = string.Format(
@@ -113,22 +101,17 @@
                 typeof(TModel).GetTypeNameAsCPlusPlusStyle().Pluralize(),
                 ExpectedId);
             actualRequest.Resource.Should().Be(expectedResource);
-            actualItem.ShouldBeSameAs(this.ManagerFixture.Model);
-        }
-
-        public void SetFixture(ManagerFixture<TModel> data)
-        {
-            this.ManagerFixture = data;
+            actualItem.ShouldBeSameAs(model);
         }
 
         [Fact]
-        public void SubmimtUpdatesFor_WhenNotSubmittedObject_ExpectSharpZendeskException()
+        public void SubmitUpdatesFor_WhenNotSubmittedObject_ExpectSharpZendeskException()
         {
             // arrange
-            var model = new TModel();
+            var model = new TModel { Id = 1 };
 
             // act & assert
-            this.Manager.Invoking(x => x.SubmitUpdatesFor(model))
+            this.testable.ClassUnderTest.Invoking(x => x.SubmitUpdatesFor(model))
                 .ShouldThrow<SharpZendeskException>()
                 .WithMessage("Cannot perform this operation. The object has not yet been submitted to Zendesk!");
         }
@@ -137,27 +120,94 @@
         public void SubmitUpdatesFor_WhenNoChangedProperties_ExpectNoChange()
         {
             // arrange
-            var model = new TModel { WasSubmitted = true };
-            this.ClientMock.Setup(x => x.Execute(It.IsAny<IRestRequest>())).Verifiable();
+            var model = new TModel { WasSubmitted = true, Id = 1 };
+            this.RequestHandlerMock.Setup(x => x.MakeRequest(It.IsAny<IRestRequest>())).Verifiable();
 
             // act
-            this.Manager.SubmitUpdatesFor(model);
+            this.testable.ClassUnderTest.SubmitUpdatesFor(model);
 
             // assert
-            this.ClientMock.Verify(x => x.Execute<TModel>(It.IsAny<IRestRequest>()), Times.Never);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest(It.IsAny<IRestRequest>()), Times.Never);
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()), Times.Never);
         }
 
         [Fact]
-        public void SubmitNew_GivenObjectWithNullMandatoryProperties_ExpectMandatoryPropertyNullValueException()
+        public virtual void SubmitNew_GivenObjectWithNullMandatoryProperties_ExpectMandatoryPropertyNullValueException()
         {
             // arrange
             var model = new TModel();
 
             // act & assert
-            this.Manager.Invoking(x => x.SubmitNew(model)).ShouldThrow<MandatoryPropertyNullValueException>();
+            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(model)).ShouldThrow<MandatoryPropertyNullValueException>();
         }
 
-        public abstract void SubmitNew_UsingParameterizedConstructor_ExpectSuccess();
+        [Fact]
+        public void SubmitNew_ExpectObjectFromMakeRequestReturned()
+        {
+            var modelMock = Mock.Of<TModel>();
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>())).Returns(modelMock);
+
+            var serializerMock = new Mock<IZendeskSerializer>();
+            serializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
+                .Returns(string.Empty);
+
+            this.ClientMock.Setup(x => x.GetSerializer(It.IsAny<SerializationScenario>()))
+                .Returns(serializerMock.Object);
+
+            var passInModel = this.testable.Fixture.Create<TModel>();
+            passInModel.WasSubmitted = false;
+
+            // act
+            var result = this.testable.ClassUnderTest.SubmitNew(passInModel);
+
+            result.ShouldBeSameAs(modelMock);
+        }
+
+        [Fact]
+        public void SubmitNew_AssertRequest()
+        {
+            // arrange
+            var model = this.testable.Fixture.Create<TModel>();
+
+            IRestRequest actualRequest = null;
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()))
+                .Returns(model)
+                .Callback<IRestRequest>(x => actualRequest = x)
+                .Verifiable();
+
+            const string JsonBodyInput = "{\"test\"=1}";
+            const string ExpectedJsonBody = "application/json=" + JsonBodyInput;
+
+            TrackableZendeskThingBase actualSerializedObject = null;
+            var serializerMock = new Mock<IZendeskSerializer>();
+            serializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
+                .Callback<TrackableZendeskThingBase>(x => actualSerializedObject = x)
+                .Returns(ExpectedJsonBody)
+                .Verifiable();
+
+            SerializationScenario? actualScenario = null;
+            this.ClientMock.Setup(x => x.GetSerializer(It.IsAny<SerializationScenario>()))
+                .Callback<SerializationScenario>(x => actualScenario = x)
+                .Returns(serializerMock.Object)
+                .Verifiable();
+
+            string expectedResource = typeof(TModel).Name.Pluralize().ToLower() + ".json";
+
+            // act
+            this.testable.ClassUnderTest.SubmitNew(model);
+
+            // assert
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()), Times.Once);
+            actualRequest.Should().NotBeNull();
+            actualRequest.Method.Should().Be(Method.POST);
+            actualRequest.Resource.Should().Be(expectedResource);
+            actualRequest.Parameters.First(x => x.Type == ParameterType.RequestBody).Value.Should().Be(ExpectedJsonBody);
+
+            actualSerializedObject.ShouldBeSameAs(model);
+
+            actualScenario.ShouldNotBeNull();
+            actualScenario.Should().Be(SerializationScenario.Create);
+        }
 
         [Fact]
         public void SubmitNew_WithAlreadySubmittedObject_ExpectArgumentException()
@@ -166,7 +216,7 @@
             var model = new TModel { WasSubmitted = true };
 
             // act & assert
-            this.Manager.Invoking(x => x.SubmitNew(model))
+            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(model))
                 .ShouldThrow<SharpZendeskException>()
                 .WithMessage("Cannot perform this operation. The object has already been submitted to Zendesk!");
         }
@@ -175,139 +225,163 @@
         public void SubmitNew_WithNull_ExpectArgumentNullException()
         {
             // act & assert
-            this.Manager.Invoking(x => x.SubmitNew(null)).ShouldThrow<ArgumentNullException>();
+            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(null)).ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
         public void SubmitUpdatesFor_WithNull_ExpectArgumentNullException()
         {
             // act & assert
-            this.Manager.Invoking(x => x.SubmitUpdatesFor(null)).ShouldThrow<ArgumentNullException>();
+            this.testable.ClassUnderTest.Invoking(x => x.SubmitUpdatesFor(null)).ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
-        public void SubmitUpdatesFor_WithValidRequestAndExistingObject_ShouldReturnSuccessful()
+        public void SubmitUpdatesFor_AssertRequest()
         {
             // arrange
-            var model = this.ManagerFixture.Fixture.Create<TModel>();
-            var modelAsTrackable = model as TrackableZendeskThingBase;
-            modelAsTrackable.Id = 1;
-            modelAsTrackable.WasSubmitted = true;
-            modelAsTrackable.ChangedProperties.Add("foo");
-
-            this.SetupOkResponse();
+            var modelMock = new Mock<TModel>();
+            modelMock.SetupProperty(x => x.Id, 1).SetupProperty(x => x.WasSubmitted, true);
+            modelMock.Object.ChangedPropertiesSet.Add("foo");
 
             IRestRequest actualRequest = null;
-            this.SetupVerifiableClientExecuteGetActualRequest(x => actualRequest = x);
+            this.SetupSingleResponse(x => actualRequest = x);
 
             const string JsonBodyInput = "{\"test\"=1}";
             const string ExpectedJsonBody = "application/json=" + JsonBodyInput;
 
             TrackableZendeskThingBase actualSerializedObject = null;
-            var fakeSerializerMock = new Mock<IZendeskSerializer>();
-            fakeSerializerMock.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
+            var serializer = new Mock<IZendeskSerializer>();
+            serializer.Setup(x => x.Serialize(It.IsAny<TrackableZendeskThingBase>()))
                 .Callback<TrackableZendeskThingBase>(x => actualSerializedObject = x)
                 .Returns(ExpectedJsonBody)
                 .Verifiable();
 
-            this.ClientMock.Object.Container.Register(
-                fakeSerializerMock.Object,
-                SerializationScenario.Create.ToString());
+            SerializationScenario? actualScenario = null;
+            this.ClientMock.Setup(x => x.GetSerializer(It.IsAny<SerializationScenario>()))
+                .Callback<SerializationScenario>(x => actualScenario = x)
+                .Returns(serializer.Object)
+                .Verifiable();
 
-            const string ExpectedResource = "tickets/1.json";
+            var pluralizedModel = (typeof(TModel).Name + "s").ToCPlusPlusNamingStyle();
+            var expectedResource = pluralizedModel + "/1.json";
 
             // act
-            this.Manager.SubmitUpdatesFor(model);
+            this.testable.ClassUnderTest.SubmitUpdatesFor(modelMock.Object);
 
             // assert
+            this.RequestHandlerMock.Verify(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()), Times.Once);
+            this.ClientMock.Verify(x => x.GetSerializer(It.IsAny<SerializationScenario>()), Times.Once);
             actualRequest.Should().NotBeNull();
             actualRequest.Method.Should().Be(Method.PUT);
-            actualRequest.Resource.Should().Be(ExpectedResource);
+            actualRequest.Resource.Should().Be(expectedResource);
             actualRequest.Parameters.First(x => x.Type == ParameterType.RequestBody).Value.Should().Be(ExpectedJsonBody);
-            actualSerializedObject.ShouldBeSameAs(model);
+
+            actualSerializedObject.ShouldBeSameAs(modelMock.Object);
+
+            actualScenario.Should().NotBeNull();
+            actualScenario.Should().Be(SerializationScenario.Update);
         }
 
         [Fact]
         public void TryGet_WhenGetFails_ExpectNullAndFalse()
         {
-            // arrange
-            var mockManager = this.GetMockManager();
-            mockManager.Setup(x => x.Get(ExpectedId)).Throws<SharpZendeskException>().Verifiable();
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()))
+                .Throws<Exception>();
 
             // act
             TInterface actualModel;
-            var actualResult = mockManager.Object.TryGet(ExpectedId, out actualModel);
+            var actualResult = this.testable.ClassUnderTest.TryGet(ExpectedId, out actualModel);
 
             // assert
             actualResult.Should().BeFalse();
             actualModel.Should().BeNull();
-            mockManager.Verify(x => x.Get(ExpectedId), Times.Once());
         }
 
         [Fact]
         public void TryGet_WhenGetSucceeds_ExpectOutAndReturnTrue()
         {
-            // arrange
-            var mockManager = this.GetMockManager();
-            mockManager.Setup(x => x.Get(It.IsAny<int>()))
-                .Callback(() => Debug.Write("MOCKED Exists"))
-                .Returns(this.ManagerFixture.Model)
-                .Verifiable();
+            var model = Mock.Of<TInterface>();
+
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()))
+                .Returns(model);
 
             // act
             TInterface actualModel;
-            var actualResult = mockManager.Object.TryGet(ExpectedId, out actualModel);
+            var actualResult = this.testable.ClassUnderTest.TryGet(ExpectedId, out actualModel);
 
             // assert
-            mockManager.Verify(x => x.Get(ExpectedId), Times.Once());
             actualResult.Should().BeTrue();
-            actualModel.Should().BeSameAs(this.ManagerFixture.Model);
+            actualModel.Should().BeSameAs(model);
         }
 
         #endregion
 
         #region Methods
 
-        internal IRestResponse<IPage<TModel>> GetPageResponse(int numberOfObjects)
+        internal void SetupListingResponse(Action<IRestRequest> callBackAction, IListing<TInterface> listing)
         {
-            var objects = new List<TModel>();
-            for (var i = 1; i <= numberOfObjects; i++)
+            this.ClientMock.Setup(x => x.GetListing<TModel, TInterface>(It.IsAny<IRestRequest>()))
+                .Returns(listing)
+                .Callback(callBackAction)
+                .Verifiable();
+        }
+
+        internal IListing<TInterface> SetupListingResponse(Action<IRestRequest> callBackAction, int numberOfItemsInPage)
+        {
+            var objects = new List<TInterface>();
+            for (var i = 1; i <= numberOfItemsInPage; i++)
             {
                 int temp = i;
                 var objectToAdd = new TModel { Id = temp };
                 objects.Add(objectToAdd);
             }
 
-            return
-                Mock.Of<IRestResponse<IPage<TModel>>>(
-                    pgRsp =>
-                    pgRsp.StatusCode == HttpStatusCode.OK
-                    && pgRsp.Data == Mock.Of<IPage<TModel>>(pg => pg.Collection == objects)
-                    && pgRsp.Request == new RestRequest(Method.GET));
+            var listing = this.testable.Fixture.Create<Mock<IListing<TInterface>>>();
+
+            listing.Setup(x => x.GetEnumerator())
+                .Returns(() => objects.GetEnumerator());
+
+            this.SetupListingResponse(callBackAction, listing.Object);
+
+            return listing.Object;
         }
 
-        protected Mock<TManager> GetMockManager(bool callBase = true)
+        internal void SetupPageResponse(Action<IRestRequest> callBackAction, IPage<TModel> page)
         {
-            return new Mock<TManager>(this.ClientMock.Object) { CallBase = callBase };
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<TModel>>(It.IsAny<IRestRequest>()))
+                .Returns(page)
+                .Callback(callBackAction)
+                .Verifiable();
         }
 
-        protected void SetupOkResponse(Method method = Method.GET)
+        internal IPage<TModel> SetupPageResponse(Action<IRestRequest> callBackAction, int numberOfItemsInPage)
         {
-            this.ResponseMock.SetupProperty(x => x.Data, this.ManagerFixture.Model)
-                .SetupProperty(x => x.StatusCode, HttpStatusCode.OK)
-                .SetupProperty(x => x.Request, Mock.Of<IRestRequest>(x => x.Method == method))
-                .SetupProperty(x => x.Data, this.ManagerFixture.Model);
+            var objects = new List<TModel>();
+            for (var i = 1; i <= numberOfItemsInPage; i++)
+            {
+                int temp = i;
+                var objectToAdd = new TModel { Id = temp };
+                objects.Add(objectToAdd);
+            }
+
+            var page = this.testable.Fixture.Create<Mock<IPage<TModel>>>().SetupProperty(pg => pg.Collection, objects).Object;
+
+            this.SetupPageResponse(callBackAction, page);
+
+            return page;
         }
 
-        protected void SetupVerifiableClientExecute()
+        protected TInterface SetupSingleResponse(Action<IRestRequest> callBackAction)
         {
-            this.SetupVerifiableClientExecuteGetActualRequest(x => { });
+            var obj = this.testable.Fixture.Freeze<TInterface>();
+            this.SetupSingleResponse(callBackAction, obj);
+            return obj;
         }
 
-        protected void SetupVerifiableClientExecuteGetActualRequest(Action<IRestRequest> callBackAction)
+        protected void SetupSingleResponse(Action<IRestRequest> callBackAction, TInterface obj)
         {
-            this.ClientMock.Setup(x => x.Execute<TModel>(It.IsAny<IRestRequest>()))
-                .Returns(this.ResponseMock.Object)
+            this.RequestHandlerMock.Setup(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()))
+                .Returns(obj)
                 .Callback(callBackAction)
                 .Verifiable();
         }

@@ -26,15 +26,19 @@
         {
             return new JsonObject
                        {
-                           { "active", fixture.Create<bool>() }, 
-                           { "conditions", JsonTestObjectFactory.Instance.Create<ConditionsJson>(fixture) }, 
-                           { "created_at", fixture.Create<DateTime>().ToUtcIso8601() }, 
-                           { "execution", JsonTestObjectFactory.Instance.Create<ExecutionJson>(fixture) }, 
-                           { "id", fixture.Create<int>() }, 
-                           { "restriction", JsonTestObjectFactory.Instance.Create<RestrictionJson>(fixture) }, 
-                           { "sla_id", fixture.Create<int>() }, 
-                           { "title", fixture.Create<string>() }, 
-                           { "updated_at", fixture.Create<DateTime>().ToUtcIso8601() }
+                           { "active", fixture.Create<bool>() },
+                           { "conditions", JsonTestObjectFactory.Instance.Create<ConditionsJson>(fixture) },
+                           { "all", JsonTestObjectFactory.Instance.CreateMany<ConditionJson>(fixture) },
+                           { "any", JsonTestObjectFactory.Instance.CreateMany<ConditionJson>(fixture) },
+                           { "created_at", fixture.Create<DateTime>().ToUtcIso8601() },
+                           { "execution", JsonTestObjectFactory.Instance.Create<ExecutionJson>(fixture) },
+                           { "id", fixture.Create<int>() },
+                           { "output", JsonTestObjectFactory.Instance.Create<ViewOutputJson>(fixture) },
+                           { "restriction", JsonTestObjectFactory.Instance.Create<RestrictionJson>(fixture) },
+                           { "sla_id", fixture.Create<int>() },
+                           { "title", fixture.Create<string>() },
+                           { "updated_at", fixture.Create<DateTime>().ToUtcIso8601() },
+                           { "url", fixture.Create<string>() }
                        };
         }
 

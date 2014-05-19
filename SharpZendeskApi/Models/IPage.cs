@@ -10,17 +10,11 @@ namespace SharpZendeskApi.Models
 {
     using System.Collections.Generic;
 
-    /// <summary>
-    /// The PagedResponse interface.
-    /// </summary>
-    /// <typeparam name="T">
-    /// Zendesk Api Model type.
-    /// </typeparam>
-    internal interface IPage<T> where T : IZendeskThing
+    internal interface IPage<TModel> where TModel : class, IZendeskThing, ITrackable
     {
         #region Public Properties
 
-        List<T> Collection { get; set; }
+        IList<TModel> Collection { get; set; }
 
         string NextPage { get; set; }
 

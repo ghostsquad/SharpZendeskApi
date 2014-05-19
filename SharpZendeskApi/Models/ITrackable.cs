@@ -1,7 +1,13 @@
 ﻿namespace SharpZendeskApi.Models
 {
-    public interface ITrackable
+    using System.Collections.Generic;
+
+    public interface ITrackable : IZendeskThing
     {
         int? Id { get; }
+
+        bool WasSubmitted { get; }
+
+        IEnumerable<string> ChangedProperties { get; }
     }
 }
