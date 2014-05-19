@@ -7,7 +7,7 @@
 
     using SharpZendeskApi.Models;
 
-    public class ViewManager : ManagerBase<View, IView>
+    public class ViewManager : ManagerBase<View, IView>, IViewManager
     {
         private const string SingleEndpoint = "views/{0}.json";
 

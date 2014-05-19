@@ -5,7 +5,7 @@
 
     using SharpZendeskApi.Models;
 
-    public class AttachmentManager : ManagerBase<Attachment, IAttachment>
+    public class AttachmentManager : ManagerBase<Attachment, IAttachment>, IAttachmentManager
     {
         private const string SingleEndpoint = "attachments/{0}.json";
 

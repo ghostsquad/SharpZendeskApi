@@ -20,7 +20,7 @@
     using Xunit;
     using Xunit.Should;
 
-    public class ViewManagerTests : ManagerTestBase<View, IView, ViewManager>
+    public class ViewManagerTests : ManagerTestBase<View, IView, ViewManager, IViewManager>
     {
         [Fact(Skip = "get many not implemented")]
         public override void GetMany_WithValidRequestAndExistingObject_ShouldReturnWithObject()
@@ -38,7 +38,7 @@
             const string ExpectedResource = "views.json";
 
             // act
-            this.testable.ClassUnderTest.GetAvailableViews(true);
+            this.TestableInterface.GetAvailableViews(true);
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -49,14 +49,14 @@
         [Fact]
         public void GetAvailableViews_ReturnsExpectedItems()
         {
-            var expectedItems = this.testable.Fixture.CreateMany<IView>();
+            var expectedItems = this.Testable.Fixture.CreateMany<IView>();
             var listingMock = Mock.Of<IListing<IView>>(x => x.GetEnumerator() == expectedItems.GetEnumerator());
 
             this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
                 .Returns(listingMock);
 
             // act
-            var actualItems = this.testable.ClassUnderTest.GetAvailableViews(true).ToList();
+            var actualItems = this.TestableInterface.GetAvailableViews(true).ToList();
 
             actualItems.ShouldBeEquivalentTo(expectedItems.ToList());
         }
@@ -71,7 +71,7 @@
             const string ExpectedResource = "views/active.json";
 
             // act
-            this.testable.ClassUnderTest.GetActiveViews();
+            this.TestableInterface.GetActiveViews();
 
             actualRequest.Should().NotBeNull();
             actualRequest.Resource.Should().Be(ExpectedResource);
@@ -81,14 +81,14 @@
         [Fact]
         public void GetActiveView_ReturnsExpectedItems()
         {
-            var expectedItems = this.testable.Fixture.CreateMany<IView>();
+            var expectedItems = this.Testable.Fixture.CreateMany<IView>();
             var listingMock = Mock.Of<IListing<IView>>(x => x.GetEnumerator() == expectedItems.GetEnumerator());
 
             this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
                 .Returns(listingMock);
 
             // act
-            var actualItems = this.testable.ClassUnderTest.GetActiveViews().ToList();
+            var actualItems = this.TestableInterface.GetActiveViews().ToList();
 
             actualItems.ShouldBeEquivalentTo(expectedItems.ToList());
         }

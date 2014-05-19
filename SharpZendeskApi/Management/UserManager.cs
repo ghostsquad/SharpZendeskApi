@@ -5,7 +5,7 @@
 
     using SharpZendeskApi.Models;
 
-    public class UserManager : ManagerBase<User, IUser>
+    public class UserManager : ManagerBase<User, IUser>, IUserManager
     {
         #region Constants
 

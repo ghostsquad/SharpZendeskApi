@@ -19,7 +19,7 @@
             var properties = this.ModelFixture.Properties.Where(x => x.GetCustomAttributes(typeof(MandatoryAttribute), true).Any());
 
             // act
-            var ticket = new Ticket(1, "test");            
+            var ticket = new Ticket(1, "test");
 
             // assert
             foreach (var property in properties)

@@ -10,7 +10,7 @@
 
     using SharpZendeskApi.Models;
 
-    public abstract class ManagerBase<TModel, TInterface>
+    public abstract class ManagerBase<TModel, TInterface> : IManager<TInterface>
         where TInterface : class, IZendeskThing, ITrackable
         where TModel : TrackableZendeskThingBase, TInterface
     {

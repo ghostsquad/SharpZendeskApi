@@ -122,6 +122,9 @@ namespace SharpZendeskApi.Models
         [ReadOnly]
         public DateTime? CreatedAt { get; set; }
 
+        [ReadOnly]
+        public string Url { get; set; }
+
         /// <summary>
         ///     Gets or sets the execution.
         /// </summary>

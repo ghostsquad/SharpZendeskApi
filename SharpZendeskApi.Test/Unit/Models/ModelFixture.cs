@@ -21,7 +21,7 @@ namespace SharpZendeskApi.Test.Unit.Models
         where TJson : JsonTestObjectBase where TModel : IZendeskThing, new()
     {
         #region Constructors and Destructors
-        
+
         public ModelFixture()
         {
             this.Properties =

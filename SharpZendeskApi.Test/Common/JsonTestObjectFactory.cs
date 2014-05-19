@@ -58,6 +58,7 @@
             this.Register<ViaJson>();
             this.Register<ViewJson>();
             this.Register<ViewOutputJson>();
+            this.Register<ViewColumnJson>();
 
             // pages
             this.Register<PageJson<TicketJson, Ticket>>();

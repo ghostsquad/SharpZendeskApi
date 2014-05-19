@@ -64,7 +64,7 @@
                 return (T)Activator.CreateInstance(typeof(TDerived), args);
             }
 
-            throw new ArgumentException(string.Format("{0} is not registered!", typeof(T)));
+            throw new ArgumentException(string.Format("{0} is not registered!", typeof(TDerived)));
         }
 
         /// <summary>

@@ -17,8 +17,8 @@
     using Xunit;
     using Xunit.Should;
 
-    public class TicketManagerTests : ManagerTestBase<Ticket, ITicket, TicketManager>
-    {        
+    public class TicketManagerTests : ManagerTestBase<Ticket, ITicket, TicketManager, ITicketManager>
+    {
         #region Public Methods and Operators
 
         [Fact]
@@ -30,13 +30,13 @@
             var expectedResourceParameter = "views/" + ExpectedId + "/tickets.json";
 
             // act
-            this.testable.ClassUnderTest.FromView(1).ToList();
+            this.TestableInterface.FromView(1).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
             actualRequest.Resource.Should().Be(expectedResourceParameter);
             actualRequest.Method.Should().Be(Method.GET);
-        }        
+        }
 
         #endregion
     }

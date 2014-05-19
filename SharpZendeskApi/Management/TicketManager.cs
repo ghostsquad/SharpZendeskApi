@@ -7,7 +7,7 @@
 
     using SharpZendeskApi.Models;
 
-    public class TicketManager : ManagerBase<Ticket, ITicket>
+    public class TicketManager : ManagerBase<Ticket, ITicket>, ITicketManager
     {
         private const string SingleTicketEndpoint = "tickets/{0}.json";
 

@@ -25,10 +25,11 @@
     using Xunit;
     using Xunit.Should;
 
-    public abstract class ManagerTestBase<TModel, TInterface, TManager>
+    public abstract class ManagerTestBase<TModel, TInterface, TManager, TManagerInterface>
         where TModel : TrackableZendeskThingBase, TInterface, new()
         where TInterface : class, IZendeskThing, ITrackable
-        where TManager : ManagerBase<TModel, TInterface>
+        where TManagerInterface : class, IManager<TInterface>
+        where TManager : ManagerBase<TModel, TInterface>, TManagerInterface
     {
         #region Constants
 
@@ -36,14 +37,23 @@
 
         #endregion
 
-        protected Testable<TManager> testable = new Testable<TManager>();
+        protected Testable<TManager> Testable { get; private set; }
+
+        protected TManagerInterface TestableInterface
+        {
+            get
+            {
+                return this.Testable.ClassUnderTest;
+            }
+        }
 
         #region Constructors and Destructors
 
         protected ManagerTestBase()
         {
+            this.Testable = new Testable<TManager>();
             this.RequestHandlerMock = new Mock<IRequestHandler>();
-            this.ClientMock = this.testable.InjectMock<ZendeskClientBase>()
+            this.ClientMock = this.Testable.InjectMock<ZendeskClientBase>()
                 .SetupProperty(x => x.RequestHandler, this.RequestHandlerMock.Object);
         }
 
@@ -72,7 +82,7 @@
                 string.Join(",", new[] { 1, 2 }));
 
             // act
-            var actualObjects = this.testable.ClassUnderTest.GetMany(new[] { 1, 2 }).Take(2).ToList();
+            var actualObjects = this.TestableInterface.GetMany(new[] { 1, 2 }).Take(2).ToList();
 
             // assert
             actualRequest.Should().NotBeNull();
@@ -90,7 +100,7 @@
             var model = this.SetupSingleResponse(x => actualRequest = x);
 
             // act
-            var actualItem = this.testable.ClassUnderTest.Get(ExpectedId);
+            var actualItem = this.TestableInterface.Get(ExpectedId);
 
             // assert
             this.RequestHandlerMock.Verify(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()), Times.Once);
@@ -111,7 +121,7 @@
             var model = new TModel { Id = 1 };
 
             // act & assert
-            this.testable.ClassUnderTest.Invoking(x => x.SubmitUpdatesFor(model))
+            this.TestableInterface.Invoking(x => x.SubmitUpdatesFor(model))
                 .ShouldThrow<SharpZendeskException>()
                 .WithMessage("Cannot perform this operation. The object has not yet been submitted to Zendesk!");
         }
@@ -124,7 +134,7 @@
             this.RequestHandlerMock.Setup(x => x.MakeRequest(It.IsAny<IRestRequest>())).Verifiable();
 
             // act
-            this.testable.ClassUnderTest.SubmitUpdatesFor(model);
+            this.TestableInterface.SubmitUpdatesFor(model);
 
             // assert
             this.RequestHandlerMock.Verify(x => x.MakeRequest(It.IsAny<IRestRequest>()), Times.Never);
@@ -138,7 +148,7 @@
             var model = new TModel();
 
             // act & assert
-            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(model)).ShouldThrow<MandatoryPropertyNullValueException>();
+            this.TestableInterface.Invoking(x => x.SubmitNew(model)).ShouldThrow<MandatoryPropertyNullValueException>();
         }
 
         [Fact]
@@ -154,11 +164,11 @@
             this.ClientMock.Setup(x => x.GetSerializer(It.IsAny<SerializationScenario>()))
                 .Returns(serializerMock.Object);
 
-            var passInModel = this.testable.Fixture.Create<TModel>();
+            var passInModel = this.Testable.Fixture.Create<TModel>();
             passInModel.WasSubmitted = false;
 
             // act
-            var result = this.testable.ClassUnderTest.SubmitNew(passInModel);
+            var result = this.TestableInterface.SubmitNew(passInModel);
 
             result.ShouldBeSameAs(modelMock);
         }
@@ -167,7 +177,7 @@
         public void SubmitNew_AssertRequest()
         {
             // arrange
-            var model = this.testable.Fixture.Create<TModel>();
+            var model = this.Testable.Fixture.Create<TModel>();
 
             IRestRequest actualRequest = null;
             this.RequestHandlerMock.Setup(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()))
@@ -194,7 +204,7 @@
             string expectedResource = typeof(TModel).Name.Pluralize().ToLower() + ".json";
 
             // act
-            this.testable.ClassUnderTest.SubmitNew(model);
+            this.TestableInterface.SubmitNew(model);
 
             // assert
             this.RequestHandlerMock.Verify(x => x.MakeRequest<TModel>(It.IsAny<IRestRequest>()), Times.Once);
@@ -216,7 +226,7 @@
             var model = new TModel { WasSubmitted = true };
 
             // act & assert
-            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(model))
+            this.TestableInterface.Invoking(x => x.SubmitNew(model))
                 .ShouldThrow<SharpZendeskException>()
                 .WithMessage("Cannot perform this operation. The object has already been submitted to Zendesk!");
         }
@@ -225,14 +235,14 @@
         public void SubmitNew_WithNull_ExpectArgumentNullException()
         {
             // act & assert
-            this.testable.ClassUnderTest.Invoking(x => x.SubmitNew(null)).ShouldThrow<ArgumentNullException>();
+            this.TestableInterface.Invoking(x => x.SubmitNew(null)).ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
         public void SubmitUpdatesFor_WithNull_ExpectArgumentNullException()
         {
             // act & assert
-            this.testable.ClassUnderTest.Invoking(x => x.SubmitUpdatesFor(null)).ShouldThrow<ArgumentNullException>();
+            this.TestableInterface.Invoking(x => x.SubmitUpdatesFor(null)).ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
@@ -266,7 +276,7 @@
             var expectedResource = pluralizedModel + "/1.json";
 
             // act
-            this.testable.ClassUnderTest.SubmitUpdatesFor(modelMock.Object);
+            this.TestableInterface.SubmitUpdatesFor(modelMock.Object);
 
             // assert
             this.RequestHandlerMock.Verify(x => x.MakeRequest<TInterface>(It.IsAny<IRestRequest>()), Times.Once);
@@ -290,7 +300,7 @@
 
             // act
             TInterface actualModel;
-            var actualResult = this.testable.ClassUnderTest.TryGet(ExpectedId, out actualModel);
+            var actualResult = this.TestableInterface.TryGet(ExpectedId, out actualModel);
 
             // assert
             actualResult.Should().BeFalse();
@@ -307,7 +317,7 @@
 
             // act
             TInterface actualModel;
-            var actualResult = this.testable.ClassUnderTest.TryGet(ExpectedId, out actualModel);
+            var actualResult = this.TestableInterface.TryGet(ExpectedId, out actualModel);
 
             // assert
             actualResult.Should().BeTrue();
@@ -336,7 +346,7 @@
                 objects.Add(objectToAdd);
             }
 
-            var listing = this.testable.Fixture.Create<Mock<IListing<TInterface>>>();
+            var listing = this.Testable.Fixture.Create<Mock<IListing<TInterface>>>();
 
             listing.Setup(x => x.GetEnumerator())
                 .Returns(() => objects.GetEnumerator());
@@ -364,7 +374,7 @@
                 objects.Add(objectToAdd);
             }
 
-            var page = this.testable.Fixture.Create<Mock<IPage<TModel>>>().SetupProperty(pg => pg.Collection, objects).Object;
+            var page = this.Testable.Fixture.Create<Mock<IPage<TModel>>>().SetupProperty(pg => pg.Collection, objects).Object;
 
             this.SetupPageResponse(callBackAction, page);
 
@@ -373,7 +383,7 @@
 
         protected TInterface SetupSingleResponse(Action<IRestRequest> callBackAction)
         {
-            var obj = this.testable.Fixture.Freeze<TInterface>();
+            var obj = this.Testable.Fixture.Freeze<TInterface>();
             this.SetupSingleResponse(callBackAction, obj);
             return obj;
         }

@@ -11,7 +11,7 @@
 
     using Xunit;
 
-    public class UserManagerTests : ManagerTestBase<User, IUser, UserManager>
+    public class UserManagerTests : ManagerTestBase<User, IUser, UserManager, IUserManager>
     {
     }
 }

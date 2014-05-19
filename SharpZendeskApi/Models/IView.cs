@@ -5,7 +5,7 @@
 
     using SharpZendeskApi.Models.Attributes;
 
-    public interface IView : IZendeskThing, ITrackable
+    public interface IView : ITrackable
     {
         /// <summary>
         ///     Gets or sets a value indicating whether active.
@@ -44,7 +44,9 @@
         string Title { get; set; }
 
         DateTime? UpdatedAt { get; }
-        
+
         DateTime? CreatedAt { get; }
+
+        string Url { get; }
     }
 }
