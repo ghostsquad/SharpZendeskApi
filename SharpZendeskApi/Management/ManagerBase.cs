@@ -10,7 +10,7 @@
 
     using SharpZendeskApi.Models;
 
-    public abstract class ManagerBase<TModel, TInterface> : IManager<TInterface>
+    public abstract class ManagerBase<TModel, TInterface>
         where TInterface : class, IZendeskThing, ITrackable
         where TModel : TrackableZendeskThingBase, TInterface
     {
@@ -130,12 +130,12 @@
 
             var request = new RestRequest(url, Method.PUT)
                               {
-                                  RequestFormat = DataFormat.Json, 
+                                  RequestFormat = DataFormat.Json,
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 
             request.AddBody(jsonBody);
-            this.Client.RequestHandler.MakeRequest<TModel>(request);
+            this.Client.RequestHandler.MakeRequest<TInterface>(request);
         }
 
         #endregion

@@ -7,7 +7,7 @@
 
     using SharpZendeskApi.Models;
 
-    public sealed class ViewManager : ManagerBase<View, IView>, IViewManager
+    public class ViewManager : ManagerBase<View, IView>
     {
         private const string SingleEndpoint = "views/{0}.json";
 
@@ -45,14 +45,14 @@
 
             var request = new RestRequest(url, Method.GET) { RootElement = this.PluralizedModelName };
 
-            return new Listing<View, IView>(this.Client, request);
+            return this.Client.GetListing<View, IView>(request);
         }
 
         public IListing<IView> GetActiveViews()
         {
             var request = new RestRequest(ActiveEndpoint, Method.GET) { RootElement = this.PluralizedModelName };
 
-            return new Listing<View, IView>(this.Client, request);
+            return this.Client.GetListing<View, IView>(request);
         }        
 
         public override IListing<IView> GetMany(IEnumerable<int> ids)

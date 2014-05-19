@@ -7,7 +7,7 @@
 
     using SharpZendeskApi.Models;
 
-    public sealed class TicketManager : ManagerBase<Ticket, ITicket>, ITicketManager
+    public class TicketManager : ManagerBase<Ticket, ITicket>
     {
         private const string SingleTicketEndpoint = "tickets/{0}.json";
 
@@ -29,21 +29,6 @@
             var request = new RestRequest(url, Method.GET) { RootElement = this.PluralizedModelName };
 
             return this.Client.GetListing<Ticket, ITicket>(request);
-        }
-
-        public IListing<ITicket> FromView(IView view)
-        {
-            if (view == null)
-            {
-                throw new ArgumentNullException("view");
-            }
-
-            if (view.Id.HasValue)
-            {
-                return this.FromView(view.Id.Value);
-            }
-
-            throw new ArgumentException("View Id is null!");
         }
 
         public override IListing<ITicket> GetMany(IEnumerable<int> ids)

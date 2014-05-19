@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpZendeskApi.Test.Unit.Management
+﻿namespace SharpZendeskApi.Test.Unit.Management
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     using FluentAssertions;
 
     using Moq;
+
+    using Ploeh.AutoFixture;
 
     using RestSharp;
 
@@ -16,45 +18,79 @@ namespace SharpZendeskApi.Test.Unit.Management
     using SharpZendeskApi.Models;
 
     using Xunit;
+    using Xunit.Should;
 
     public class ViewManagerTests : ManagerTestBase<View, IView, ViewManager>
     {
-        [Fact(Skip = "not implemented")]
+        [Fact(Skip = "get many not implemented")]
         public override void GetMany_WithValidRequestAndExistingObject_ShouldReturnWithObject()
         {
-            throw new NotImplementedException();
-        }
-
-        [Fact(Skip = "not implemented")]
-        public override void SubmitNew_AssertRequestConstruction()
-        {
-            throw new NotImplementedException();
         }
 
         [Fact]
-        public void GetAvailableViews_AssertRequestConstruction()
+        public void GetAvailableViews_AssertRequest()
         {            
             // arrange
             IRestRequest actualRequest = null;
-            var page = this.SetupPageResponse(x => actualRequest = x, 2);
+            this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
+                .Callback<IRestRequest>(x => actualRequest = x);
 
-            this.RequestHandlerMock.Setup(x => x.MakeRequest<IPage<View>>(It.IsAny<IRestRequest>()))
-                .Returns(page)
-                .Callback<IRestRequest>(r => actualRequest = r);
-
-            var expectedResourceParameter = string.Format(
-                "{0}.json",
-                typeof(View).GetTypeNameAsCPlusPlusStyle().Pluralize());
-
-            var manager = this.testable.ClassUnderTest;
+            const string ExpectedResource = "views.json";
 
             // act
-            manager.GetAvailableViews(true).Take(2).ToList();
+            this.testable.ClassUnderTest.GetAvailableViews(true);
 
             // assert
             actualRequest.Should().NotBeNull();
-            actualRequest.Resource.Should().Be(expectedResourceParameter);
+            actualRequest.Resource.Should().Be(ExpectedResource);
             actualRequest.Method.Should().Be(Method.GET);
+        }
+
+        [Fact]
+        public void GetAvailableViews_ReturnsExpectedItems()
+        {
+            var expectedItems = this.testable.Fixture.CreateMany<IView>();
+            var listingMock = Mock.Of<IListing<IView>>(x => x.GetEnumerator() == expectedItems.GetEnumerator());
+
+            this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
+                .Returns(listingMock);
+
+            // act
+            var actualItems = this.testable.ClassUnderTest.GetAvailableViews(true).ToList();
+
+            actualItems.ShouldBeEquivalentTo(expectedItems.ToList());
+        }
+
+        [Fact]
+        public void GetActiveViews_AssertRequest()
+        {
+            IRestRequest actualRequest = null;
+            this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
+                .Callback<IRestRequest>(x => actualRequest = x);
+
+            const string ExpectedResource = "views/active.json";
+
+            // act
+            this.testable.ClassUnderTest.GetActiveViews();
+
+            actualRequest.Should().NotBeNull();
+            actualRequest.Resource.Should().Be(ExpectedResource);
+            actualRequest.Method.Should().Be(Method.GET);
+        }
+
+        [Fact]
+        public void GetActiveView_ReturnsExpectedItems()
+        {
+            var expectedItems = this.testable.Fixture.CreateMany<IView>();
+            var listingMock = Mock.Of<IListing<IView>>(x => x.GetEnumerator() == expectedItems.GetEnumerator());
+
+            this.ClientMock.Setup(x => x.GetListing<View, IView>(It.IsAny<IRestRequest>()))
+                .Returns(listingMock);
+
+            // act
+            var actualItems = this.testable.ClassUnderTest.GetActiveViews().ToList();
+
+            actualItems.ShouldBeEquivalentTo(expectedItems.ToList());
         }
     }
 }

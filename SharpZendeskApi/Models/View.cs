@@ -54,6 +54,12 @@ namespace SharpZendeskApi.Models
             this.ChangedPropertiesSet.Clear();
         }
 
+        public View(Condition[] all, string title)
+        {
+            this.all = all;
+            this.title = title;
+        }
+
         #endregion
 
         #region Public Properties

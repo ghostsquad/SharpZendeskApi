@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpZendeskApi.Test.Unit.Management
+﻿namespace SharpZendeskApi.Test.Unit.Management
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     using SharpZendeskApi.Management;
     using SharpZendeskApi.Models;
 
@@ -13,10 +13,5 @@ namespace SharpZendeskApi.Test.Unit.Management
 
     public class UserManagerTests : ManagerTestBase<User, IUser, UserManager>
     {
-        [Fact(Skip = "not implemented")]
-        public override void SubmitNew_AssertRequestConstruction()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
