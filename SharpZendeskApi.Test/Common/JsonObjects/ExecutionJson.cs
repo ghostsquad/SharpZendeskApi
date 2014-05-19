@@ -24,8 +24,8 @@
         {
             return new JsonObject
                        {
-                           { "columns", JsonTestObjectFactory.Instance.CreateMany<TicketFieldJson>(fixture) }, 
-                           { "group", JsonTestObjectFactory.Instance.Create<GroupSortJson>(fixture) }, 
+                           { "columns", JsonTestObjectFactory.Instance.CreateMany<ViewColumnJson>(fixture) },
+                           { "group", JsonTestObjectFactory.Instance.Create<GroupSortJson>(fixture) },
                            { "sort", JsonTestObjectFactory.Instance.Create<GroupSortJson>(fixture) }
                        };
         }

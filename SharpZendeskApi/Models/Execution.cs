@@ -16,10 +16,14 @@ namespace SharpZendeskApi.Models
     {
         #region Public Properties
 
+        public IList<ViewColumn> Columns { get; set; }
+
+        public IList<ViewColumn> Fields { get; set; }
+
         /// <summary>
         /// Gets or sets the columns.
         /// </summary>
-        public List<TicketField> Columns { get; set; }
+        public IList<TicketField> CustomFields { get; set; }
 
         /// <summary>
         /// Gets or sets the group.
@@ -30,6 +34,14 @@ namespace SharpZendeskApi.Models
         /// Gets or sets the sort.
         /// </summary>
         public GroupSort Sort { get; set; }
+
+        public string GroupBy { get; set; }
+
+        public string GroupOrder { get; set; }
+
+        public string SortBy { get; set; }
+
+        public string SortOrder { get; set; }
 
         #endregion
     }

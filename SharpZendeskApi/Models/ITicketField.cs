@@ -33,7 +33,8 @@
         /// <summary>
         ///     Gets or sets the regexp for validation.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "This is the name of the zendesk api key.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly",
+            Justification = "This is the name of the zendesk api key.")]
         string RegexpForValidation { get; set; }
 
         /// <summary>

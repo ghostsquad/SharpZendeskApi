@@ -32,7 +32,7 @@
             ticket.CreatedAt.Should().HaveValue();
         }
 
-        [Fact(Timeout = 10000)]
+        [Fact(Timeout = 30000)]
         public void GetMany_UsingKnownIds()
         {
             var client = TestHelpers.GetClient(ZendeskAuthenticationMethod.Basic);

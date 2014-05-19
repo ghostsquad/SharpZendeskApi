@@ -33,11 +33,12 @@
                            { "created_at", fixture.Create<DateTime>().ToUtcIso8601() },
                            { "execution", JsonTestObjectFactory.Instance.Create<ExecutionJson>(fixture) },
                            { "id", fixture.Create<int>() },
-                           { "output", JsonTestObjectFactory.Instance.Create<ViewOutputJson>(fixture)},
+                           { "output", JsonTestObjectFactory.Instance.Create<ViewOutputJson>(fixture) },
                            { "restriction", JsonTestObjectFactory.Instance.Create<RestrictionJson>(fixture) },
                            { "sla_id", fixture.Create<int>() },
                            { "title", fixture.Create<string>() },
-                           { "updated_at", fixture.Create<DateTime>().ToUtcIso8601() }
+                           { "updated_at", fixture.Create<DateTime>().ToUtcIso8601() },
+                           { "url", fixture.Create<string>() }
                        };
         }
 

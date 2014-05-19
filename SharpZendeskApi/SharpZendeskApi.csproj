@@ -61,6 +61,7 @@
     <Compile Include="ContractResolution\IncludeOnlyChangedPropertiesCustomization.cs" />
     <Compile Include="CreationSerializer.cs" />
     <Compile Include="IRequestHandler.cs" />
+    <Compile Include="Models\ViewColumn.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="ZendeskClientBase.cs" />
     <Compile Include="IZendeskSerializer.cs" />
