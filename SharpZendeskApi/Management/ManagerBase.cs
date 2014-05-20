@@ -71,7 +71,10 @@
                                   RootElement = typeof(TModel).GetTypeNameAsCPlusPlusStyle()
                               };
 
-            return this.Client.RequestHandler.MakeRequest<TInterface>(request);
+            var obj = this.Client.RequestHandler.MakeRequest<TInterface>(request);
+            (obj as TModel).WasSubmitted = true;
+
+            return obj;
         }
 
         protected virtual IListing<TInterface> GetMany(string url)

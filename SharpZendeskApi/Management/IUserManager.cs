@@ -4,5 +4,6 @@
 
     public interface IUserManager : IManager<IUser>
     {
+        IListing<IUser> Search(string query);
     }
 }

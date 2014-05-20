@@ -123,6 +123,7 @@
             {
                 get
                 {
+                    (this.currentPageCollection[this.currentIndexWithinPage] as TModel).WasSubmitted = true;
                     return this.currentPageCollection[this.currentIndexWithinPage];
                 }
             }

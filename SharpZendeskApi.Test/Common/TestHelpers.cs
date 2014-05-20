@@ -61,7 +61,7 @@
         #region Public Methods and Operators
 
         public static ZendeskClientBase GetClient(
-            ZendeskAuthenticationMethod authenticationMethod, 
+            ZendeskAuthenticationMethod authenticationMethod,
             bool useGoodPasswordToken = true)
         {
             try

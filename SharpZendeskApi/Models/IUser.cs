@@ -5,7 +5,7 @@
 
     using SharpZendeskApi.Models.Attributes;
 
-    public interface IUser : IZendeskThing, ITrackable
+    public interface IUser : ITrackable
     {
         /// <summary>
         /// Gets a value indicating whether active.

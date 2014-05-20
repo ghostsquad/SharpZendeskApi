@@ -130,6 +130,7 @@
     <Compile Include="Common\RespectOnlyReadOnlyPropertiesSpecimenCustomization.cs" />
     <Compile Include="Common\Testable.cs" />
     <Compile Include="End2End\TicketTests.cs" />
+    <Compile Include="End2End\UserTests.cs" />
     <Compile Include="End2End\ViewTests.cs" />
     <Compile Include="Fakes\ExcludeAttributeCustomization.cs" />
     <Compile Include="Fakes\FakeZendeskThing.cs" />

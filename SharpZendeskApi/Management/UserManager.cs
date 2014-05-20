@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
 
+    using RestSharp;
+
     using SharpZendeskApi.Models;
 
     public class UserManager : ManagerBase<User, IUser>, IUserManager
@@ -20,6 +22,8 @@
         private const string GetManyEndpoint = "users/show_many.json?ids={0}";
 
         private const string SingleUserEndpoint = "users/{0}.json";
+
+        private const string SearchEndpoint = "users/search.json";
 
         #endregion
 
@@ -59,6 +63,14 @@
 
             var url = string.Format(SingleUserEndpoint, obj.Id);
             this.SubmitUpdatesFor(url, obj);
+        }
+
+        public IListing<IUser> Search(string query)
+        {
+            var request = new RestRequest(SearchEndpoint, Method.GET);
+            request.AddParameter("query", query, ParameterType.QueryString);
+
+            return this.Client.GetListing<User, IUser>(request);
         }
 
         #endregion
