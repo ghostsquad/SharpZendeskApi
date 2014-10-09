@@ -194,6 +194,7 @@
                 this.currentPageNumber += 1;
 
                 var nextRequest = new RestRequest(this.lastRequest.Resource, Method.GET);
+                var pageSet = false;
                 if (this.lastRequest.Parameters != null)
                 {
                     foreach (var param in this.lastRequest.Parameters)
@@ -201,12 +202,14 @@
                         if (param.Name == "page")
                         {
                             param.Value = this.currentPageNumber;
+                            pageSet = true;
                         }
 
                         nextRequest.AddParameter(param);
                     }
                 }
-                else
+
+                if(!pageSet)
                 {
                     nextRequest.AddParameter("page", this.currentPageNumber);
                 }
